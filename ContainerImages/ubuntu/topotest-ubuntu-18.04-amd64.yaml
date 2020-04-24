@@ -21,7 +21,8 @@ targets:
 
       SSH Server enabled, but no host keys. Copy keys or run
       dpkg-reconfigure openssh-server
-      No default root or user password are set by LXC.
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
 
     config:
       - type: all
@@ -163,33 +164,33 @@ packages:
   sets:
     - packages:
       - apt-transport-https
-      - openssh-client
-      - openssh-server
-      - libc-ares2
+      - dnsutils
+      - gdb
       - iproute2
       - iputils-ping
-      - python-ipaddr
-      - python-pytest
+      - libc-ares2
       - mininet
+      - openssh-client
+      - openssh-server
+      - python-ipaddr
       - python-pip
-      - gdb
-      - dnsutils
+      - python-pytest
       action: install
 
     - packages:
-      - x11-common
-      - xdg-utils
-      - xauth
-      - tcl8.6
-      - tcl-expect
       - gcc
       - gcc-7
       - gcc-8
-      - tex-common
-      - texinfo
+      - geoip-database
       - perl
       - perl-modules-5.26
-      - geoip-database
+      - tcl-expect
+      - tcl8.6
+      - tex-common
+      - texinfo
+      - x11-common
+      - xauth
+      - xdg-utils
       action: remove
 
 actions:
@@ -200,9 +201,11 @@ actions:
 
       # Create the sudo group
       getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
-      # Create the ubuntu user account
-      # useradd --create-home -s /bin/bash -G sudo -U ubuntu
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
 
   - trigger: post-packages
     action: |-
