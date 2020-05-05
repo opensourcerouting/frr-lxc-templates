@@ -199,7 +199,6 @@ packages:
       - libsnmp-base
       - libsnmp-dev
       - libssh-dev
-      - libssh-dev
       - libsystemd-dev
       - libtool
       - lintian

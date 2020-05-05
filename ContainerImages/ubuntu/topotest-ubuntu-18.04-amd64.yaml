@@ -167,6 +167,7 @@ packages:
       - dnsutils
       - gdb
       - iproute2
+      - libssh-4
       - iputils-ping
       - libc-ares2
       - mininet
@@ -216,14 +217,13 @@ actions:
       /usr/bin/pip install 'exabgp==3.4.17'
       useradd -d /var/run/exabgp/ -s /bin/false exabgp
 
-  - trigger: post-packages
-    action: |-
-      #!/bin/sh
-      set -eux
-
       # Make sure the locale is built and functional
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
+
+      # Disable OpenVSwitch startup - we provide our
+      # own as part of the topotests
+      systemctl disable openvswitch-switch
 
       # Cleanup underlying /run
       mount -o bind / /mnt
