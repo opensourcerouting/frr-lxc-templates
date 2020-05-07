@@ -2,8 +2,8 @@
 
 ## Requirements
 
-Only tested on Ubuntu 18.04 LTS as the LXC Server host, but might work on other 
-Distros and versions
+Only tested on Ubuntu 18.04 LTS and 20.04 LTS as the LXC Server host, but 
+might work on other Distros and versions
 
 It is tested on Intel 64bit Architecture (x86_64) and Raspberry Pi 4.
 
@@ -86,15 +86,23 @@ Reboot LXC Host to activate the changes
 (Example based on Ubuntu 18.04 AMD64 Template. Use Template as needed)
 
 	cd ContainerImages/ubuntu
-	distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml
+	distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml
+
+or to override the Distrobution to Ubuntu 16.04 (xenial) use
+
+	distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial
+
+or to build i386 Ubuntu 16.04:
+
+	distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=i386
 
 3. Add build LXC image to the local containers
 
 Image is built, needs to be added to local image storage
 
-	lxc-create -n topotest-ubuntu-18.04-amd64 -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz
+	lxc-create -n topotest_ubuntu1804_amd64 -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz
 
-This creates a new `topotest-ubuntu-18.04-amd64` container.
+This creates a new `topotest_ubuntu1804_amd64` container.
 
 Step 2 & 3 can be repeated for each LXC image you want to buil
 
@@ -108,9 +116,9 @@ host.
 Create and start a ephemeral copy of the image (the ephemeral images
 only save changes to template and are deleted on shutdown).
 
-	lxc-copy -n topotest-ubuntu-18.04-amd64 -N mytopotest -e -m bind=/root/shared:/root/shared
+	lxc-copy -n topotest_ubuntu1804_amd64 -N mytopotest -e -m bind=/root/shared:/root/shared
 
-`topotest-ubuntu-18.04-amd64` is the name of the templated container created in previous
+`topotest_ubuntu1804_amd64` is the name of the templated container created in previous
 step. {Check `lxc-ls -f` for a list of locally available containers)
 `mytopotest` is the name of the new container created and started.
 
