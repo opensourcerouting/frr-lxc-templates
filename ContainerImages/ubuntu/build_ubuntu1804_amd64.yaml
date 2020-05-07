@@ -1,5 +1,11 @@
+# Tested on for
+#   Ubuntu 18.04 amd64       (bionic)
+#   Ubuntu 16.04 amd64/i386  (xenial)
+#
+# Other Distro's and architectures are untested, but may work
+
 image:
-  name: ubuntu-bionic-x86_64
+  name: ubuntu-buildfrr
   distribution: ubuntu
   release: bionic
   description: |-
@@ -129,6 +135,14 @@ files:
    variants:
     - cloud
 
+ - path: /etc/lxc-config
+   generator: dump
+   content: |-
+     lxc.imagename={{ image.name }}
+     lxc.release={{ image.release }}
+     lxc.arch={{ image.architecture }}
+     lxc.distro={{ image.distribution }}
+
 
 packages:
   manager: apt
@@ -193,7 +207,6 @@ packages:
       - libpam-dev
       - libpcre3-dev 
       - libprotobuf-c-dev
-      - libprotoc10
       - libreadline-dev
       - libsensors4-dev
       - libsnmp-base
@@ -220,6 +233,18 @@ packages:
       - vim
       - zlib1g-dev
       action: install
+
+    - packages:
+      - libprotoc9v5
+      action: install
+      releases:
+        - xenial
+
+    - packages:
+      - libprotoc10
+      action: install
+      releases:
+        - bionic
 
     - packages:
       - geoip-database
@@ -271,6 +296,9 @@ actions:
 
       # Cleanup temporary shadow paths
       rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
 
 mappings:
   architecture_map: debian

@@ -1,5 +1,9 @@
+# Tested on for
+#   Ubuntu 18.04 amd64  (bionic)
+#   Ubuntu 16.04 amd64  (xenial)
+
 image:
-  name: ubuntu-bionic-x86_64
+  name: ubuntu-topotest
   distribution: ubuntu
   release: bionic
   description: |-
@@ -91,6 +95,7 @@ files:
      - bionic
      - cosmic
      - disco
+     - focal
 
  - path: /etc/network/interfaces
    generator: dump
@@ -132,6 +137,14 @@ files:
    generator: cloud-init
    variants:
     - cloud
+
+ - path: /etc/lxc-config
+   generator: dump
+   content: |-
+     lxc.imagename={{ image.name }}
+     lxc.release={{ image.release }}
+     lxc.arch={{ image.architecture }}
+     lxc.distro={{ image.distribution }}
 
 
 packages:
@@ -175,16 +188,18 @@ packages:
       - openssh-server
       - python-ipaddr
       - python-pip
-      - python-pytest
       action: install
+
+    -packages:
+      - libsnmp30
+      action: install
+      releases:
+        - xenial
 
     - packages:
       - gcc
-      - gcc-7
-      - gcc-8
       - geoip-database
       - perl
-      - perl-modules-5.26
       - tcl-expect
       - tcl8.6
       - tex-common
@@ -192,7 +207,22 @@ packages:
       - x11-common
       - xauth
       - xdg-utils
+      - python-pytest
       action: remove
+
+    - packages:
+      - perl-modules-5.22
+      action: remove
+      releases:
+        - xenial
+
+    - packages:
+      - gcc-7
+      - gcc-8
+      - perl-modules-5.26
+      action: remove
+      releases:
+        - bionic
 
 actions:
   - trigger: post-update
@@ -213,10 +243,6 @@ actions:
       #!/bin/sh
       set -eux
 
-      # Install ExaBGP 3.4.17 with PIP
-      /usr/bin/pip install 'exabgp==3.4.17'
-      useradd -d /var/run/exabgp/ -s /bin/false exabgp
-
       # Make sure the locale is built and functional
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
@@ -224,6 +250,19 @@ actions:
       # Disable OpenVSwitch startup - we provide our
       # own as part of the topotests
       systemctl disable openvswitch-switch
+
+      # Upgrade PIP to current
+      /usr/bin/pip install --upgrade pip
+
+      # Install zipp 1.2.0 (newer fails on ARM)
+      /usr/local/bin/pip install 'zipp==1.2.0'
+
+      # Install pytest before v5 for mininet
+      /usr/local/bin/pip install 'pytest'
+
+      # Install ExaBGP 3.4.17 with PIP
+      /usr/local/bin/pip install 'exabgp==3.4.17'
+      useradd -d /var/run/exabgp/ -s /bin/false exabgp
 
       # Cleanup underlying /run
       mount -o bind / /mnt
@@ -235,6 +274,9 @@ actions:
 
       # Cleanup temporary shadow paths
       rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
 
 mappings:
   architecture_map: debian
