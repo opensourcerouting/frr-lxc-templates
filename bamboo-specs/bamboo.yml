@@ -18,7 +18,7 @@ stages:
 
 Save_Build_Version:
   requirements:
-    - buildnode_type: lxc
+    - bambooserver
 
   artifacts:
     -
@@ -103,35 +103,67 @@ Build_Ubuntu1804_amd64:
           -     set -x
           - fi
           #
+          ##### EDIT HERE #####
           - lxcReleaseName=bionic
           - lxcRelease=ubuntu1804
           - lxcArch=amd64
           - lxcTemplate=topotest
+          ##### UNTIL HERE ####
+          #
+          - lxcName=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - lxcYAML=${lxcTemplate}_ubuntu1804_amd64.yaml
+          - new_sha256=`sha256sum ContainerImages/ubuntu/${lxcYAML} | cut -d " " -f 1`
           #
           # Define Architecture and Release
           - echo "# " >> README.SourceVersion.txt
           - echo "lxcReleaseName=${lxcReleaseName}" >> README.SourceVersion.txt
-          - echo "lxcRelease=${ubuntu1804}" >> README.SourceVersion.txt
+          - echo "lxcRelease=${lxcRelease}" >> README.SourceVersion.txt
           - echo "lxcArch=${lxcArch}" >> README.SourceVersion.txt
           - echo "lxcTemplate=${lxcTemplate}" >> README.SourceVersion.txt
+          - echo "lxcYAMLsha256=${new_sha256}" >> README.SourceVersion.txt
+          #
+          # Check if unchanged if it already exists
+          - if [ -f "/var/lib/lxc/${lxcName}/rootfs/etc/README.SourceVersion.txt" ]; then
+          -     . /var/lib/lxc/${lxcName}/rootfs/etc/README.SourceVersion.txt
+          -     if [ "${lxcYAMLsha256}" = "${new_sha256}" ]; then
+          -         echo ""
+          -         echo ""
+          -         echo "Checked ${lxcYAML} against current LXC ${lxcName}"
+          -         echo "No changes in YAML for ${lxcName} - skipping build"
+          -         echo ""
+          -         echo ""
+          -         exit 0
+          -     else
+          -         echo ""
+          -         echo ""
+          -         echo "Checked ${lxcYAML} against current LXC ${lxcName}"
+          -         echo "YAML file has changed - rebuilding the container"
+          -         echo ""
+          -         echo ""
+          -     fi
+          - fi
+          #
+          - chmod 755 ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
           #
           # Build LXC Directory for Build container
           - cd ContainerImages/ubuntu
-          - lxcName=${lxcTemplate}_${lxcRelease}_${lxcArch}
           - rm -rf ${lxcTemplate}
-          - distrobuilder build-dir ${lxcTemplate}_ubuntu1804_amd64.yaml ${lxcTemplate} -o image.release=${lxcReleaseName} -o image.arch=${lxcArch}
+          - distrobuilder build-dir ${lxcYAML} ${lxcTemplate} -o image.release=${lxcReleaseName} -o image.architecture=${lxcArch}
           #
           # Add README.Sourceversion.txt
           - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.txt
           #
           # Pack up image
-          - distrobuilder build-dir ${lxcTemplate}_ubuntu1804_amd64.yaml ${lxcTemplate}
+          - distrobuilder pack-lxc ${lxcYAML} ${lxcTemplate}
+          - ls -al
           #
           # Install new image
           - lxc-stop -n ${lxcName} ?| true
           - lxc-destroy -n ${lxcName} ?| true
           - lxc-create -n ${lxcName} -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz
-          # Add authorized_keys to LXC images
+          #
+          # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
@@ -146,16 +178,14 @@ Build_Ubuntu1804_amd64:
           - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
-          - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
-          - echo "127.0.0.1   localhost" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
-          - echo "::1         localhost ip6-localhost ip6-loopback" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
-          - echo "ff02::1     ip6-allnodes" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
-          - echo "ff02::2     ip6-allrouters" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "127.0.0.1   localhost" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "::1         localhost ip6-localhost ip6-loopback" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "ff02::1     ip6-allnodes" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "ff02::2     ip6-allrouters" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
           - echo "${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
           #
-          # Add SSH Host keys
-          - lxc-start ${lxctemplate}
-          - lxc-attach ${lxctemplate} -- dpkg-reconfigure openssh-server
-          - lxc-attach ${lxctemplate} -- poweroff
-          #
-          - exit 0
+          # Create new SSH Host keys
+          - lxc-start ${lxcName}
+          - lxc-attach ${lxcName} -- dpkg-reconfigure openssh-server
+          - lxc-attach ${lxcName} -- poweroff
