@@ -1,0 +1,33 @@
+---
+version: 2
+plan:
+  project-key: TESTING
+  key: TESTLXC
+  name: FRR LXC Container Testing
+
+variables:
+  bamboo_ci_script_verbose: YES
+
+stages:
+  - Building_LXC:
+      jobs:
+        - Build_Ubuntu1804_amd64
+
+Build_Ubuntu1804_amd64:
+  requirements:
+    - buildnode_type: lxc
+    - arch: amd64
+
+  tasks:
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -         set -x
+          - fi
+          - pwd
+          - ls
+          - exit 0
+
