@@ -1,6 +1,10 @@
 # Tested on for
 #   Ubuntu 18.04 amd64  (bionic)
 #   Ubuntu 16.04 amd64  (xenial)
+#
+# Use Distrobuilder (see README.md) to create the LXC images
+# Default output is Ubuntu 18.04 on x86_64 architucture
+#
 
 image:
   name: ubuntu-topotest
@@ -44,7 +48,7 @@ targets:
         content: |-
           lxc.include = LXC_TEMPLATE_CONFIG/common.conf
 
-          # For Ubuntu 14.04 XX
+          # For Ubuntu 14.04
           lxc.mount.entry = /sys/kernel/debug sys/kernel/debug none bind,optional 0 0
           lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 0
           lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
@@ -68,84 +72,76 @@ targets:
           lxc.arch = {{ image.architecture_personality }}
 
 files:
- - path: /etc/hostname
-   generator: hostname
 
- - path: /etc/hosts
-   generator: hosts
+  - path: /etc/hostname
+    generator: hostname
 
- - path: /etc/resolvconf/resolv.conf.d/original
-   generator: remove
+  - path: /etc/hosts
+    generator: hosts
 
- - path: /etc/resolvconf/resolv.conf.d/tail
-   generator: remove
+  - path: /etc/resolvconf/resolv.conf.d/original
+    generator: remove
 
- - path: /etc/machine-id
-   generator: remove
+  - path: /etc/resolvconf/resolv.conf.d/tail
+    generator: remove
 
- - path: /etc/netplan/10-lxc.yaml
-   generator: dump
-   content: |-
-     network:
-       version: 2
-       ethernets:
-         eth0: {dhcp4: true}
-   releases:
-     - artful
-     - bionic
-     - cosmic
-     - disco
-     - focal
+  - path: /etc/machine-id
+    generator: remove
 
- - path: /etc/network/interfaces
-   generator: dump
-   content: |-
-     # This file describes the network interfaces available on your system
-     # and how to activate them. For more information, see interfaces(5).
+  - path: /etc/netplan/10-lxc.yaml
+    generator: dump
+    content: |-
+      network:
+        version: 2
+        ethernets:
+          eth0: {dhcp4: true}
+    releases:
+    - artful
+    - bionic
+    - cosmic
+    - disco
+    - focal
 
-     # The loopback network interface
-     auto lo
-     iface lo inet loopback
+  - path: /etc/network/interfaces
+    generator: dump
+    content: |-
+      # This file describes the network interfaces available on your system
+      # and how to activate them. For more information, see interfaces(5).
 
-     auto eth0
-     iface eth0 inet dhcp
-   releases:
-     - trusty
-     - xenial
+      # The loopback network interface
+      auto lo
+      iface lo inet loopback
 
- - path: /etc/init/lxc-tty.conf
-   generator: upstart-tty
-   releases:
+      auto eth0
+      iface eth0 inet dhcp
+    releases:
+    - trusty
+    - xenial
+
+  - path: /etc/init/lxc-tty.conf
+    generator: upstart-tty
+    releases:
     - trusty
 
- - name: meta-data
-   generator: cloud-init
-   variants:
+  - name: meta-data
+    generator: cloud-init
+    variants:
     - cloud
 
- - name: network-config
-   generator: cloud-init
-   variants:
+  - name: network-config
+    generator: cloud-init
+    variants:
     - cloud
 
- - name: user-data
-   generator: cloud-init
-   variants:
+  - name: user-data
+    generator: cloud-init
+    variants:
     - cloud
 
- - name: vendor-data
-   generator: cloud-init
-   variants:
+  - name: vendor-data
+    generator: cloud-init
+    variants:
     - cloud
-
- - path: /etc/lxc-config
-   generator: dump
-   content: |-
-     lxc.imagename={{ image.name }}
-     lxc.release={{ image.release }}
-     lxc.arch={{ image.architecture }}
-     lxc.distro={{ image.distribution }}
-
 
 packages:
   manager: apt
@@ -183,18 +179,13 @@ packages:
       - libssh-4
       - iputils-ping
       - libc-ares2
+      - libsnmp30
       - mininet
       - openssh-client
       - openssh-server
       - python-ipaddr
       - python-pip
       action: install
-
-    -packages:
-      - libsnmp30
-      action: install
-      releases:
-        - xenial
 
     - packages:
       - gcc
@@ -211,15 +202,8 @@ packages:
       action: remove
 
     - packages:
-      - perl-modules-5.22
-      action: remove
-      releases:
-        - xenial
-
-    - packages:
       - gcc-7
       - gcc-8
-      - perl-modules-5.26
       action: remove
       releases:
         - bionic
@@ -277,6 +261,14 @@ actions:
 
       # Add builddate to /etc/lxc-config
       echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.imagename={{ image.name }}" >> /etc/lxc-config
+      echo "lxc.release={{ image.release }}" >> /etc/lxc-config
+      echo "lxc.arch={{ image.architecture }}" >> /etc/lxc-config
+      echo "lxc.distro={{ image.distribution }}" >> /etc/lxc-config
+      echo "lxc.variant={{ image.variants }}" >> /etc/lxc-config
+      echo "lxc.serial={{ image.serial }}" >> /etc/lxc-config
+      echo "container.name={{ container.name }}" >> /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config1
 
 mappings:
   architecture_map: debian

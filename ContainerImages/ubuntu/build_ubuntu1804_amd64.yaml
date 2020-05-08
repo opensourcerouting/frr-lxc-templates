@@ -297,8 +297,7 @@ actions:
       # Cleanup temporary shadow paths
       rm /etc/*-
 
-      # Add builddate to /etc/lxc-config
-      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
-
 mappings:
+  architectures:
+    amd64: x86_64
   architecture_map: debian
