@@ -135,14 +135,6 @@ files:
    variants:
     - cloud
 
- - path: /etc/lxc-config
-   generator: dump
-   content: |-
-     lxc.imagename={{ image.name }}
-     lxc.release={{ image.release }}
-     lxc.arch={{ image.architecture }}
-     lxc.distro={{ image.distribution }}
-
 
 packages:
   manager: apt
