@@ -11,12 +11,13 @@ variables:
 stages:
   - Version_Stage:
       jobs:
-        - Save_Build_Version
+        - Save_Version
   - Building_LXC:
       jobs:
         - Build_Ubuntu1804_amd64
+        - Topotest_Ubuntu1804_amd64
 
-Save_Build_Version:
+Save_Version:
   requirements:
     - bambooserver
 
@@ -82,8 +83,275 @@ Save_Build_Version:
           -     echo "Github_Merge_Base_Commit='${bamboo_github_base_sha}'" >> README.SourceVersion.txt
           - fi
 
+# =============================================================================================================
 
 Build_Ubuntu1804_amd64:
+  requirements:
+    - buildnode_type: lxc
+    - arch: amd64
+
+  tasks:
+    - artifact-download:
+        source-plan: TESTING-TESTLXC
+        artifacts:
+          - name: SourceVersion
+
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          ##### EDIT HERE #####
+          - lxcReleaseName=bionic
+          - lxcRelease=ubuntu1804
+          - lxcArch=amd64
+          - lxcTemplate=build
+          ##### UNTIL HERE ####
+          #
+          - lxcName=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - lxcYAML=${lxcTemplate}_ubuntu1804_amd64.yaml
+          - new_sha256=`sha256sum ContainerImages/ubuntu/${lxcYAML} | cut -d " " -f 1`
+          #
+          # Define Architecture and Release
+          - echo "# " >> README.SourceVersion.txt
+          - echo "lxcReleaseName=${lxcReleaseName}" >> README.SourceVersion.txt
+          - echo "lxcRelease=${lxcRelease}" >> README.SourceVersion.txt
+          - echo "lxcArch=${lxcArch}" >> README.SourceVersion.txt
+          - echo "lxcTemplate=${lxcTemplate}" >> README.SourceVersion.txt
+          - echo "lxcYAMLsha256=${new_sha256}" >> README.SourceVersion.txt
+          #
+          # Check if unchanged if it already exists
+          - if [ -f "/var/lib/lxc/${lxcName}/rootfs/etc/README.SourceVersion.txt" ]; then
+          -     . /var/lib/lxc/${lxcName}/rootfs/etc/README.SourceVersion.txt
+          -     if [ "${lxcYAMLsha256}" = "${new_sha256}" ]; then
+          -         echo ""
+          -         echo ""
+          -         echo "Checked ${lxcYAML} against current LXC ${lxcName}"
+          -         echo "No changes in YAML for ${lxcName} - skipping build"
+          -         echo ""
+          -         echo ""
+          -         echo "update=SKIP" > ${bamboo_build_working_directory}/status.txt
+          -         exit 0
+          -     else
+          -         echo ""
+          -         echo ""
+          -         echo "Checked ${lxcYAML} against current LXC ${lxcName}"
+          -         echo "YAML file has changed - rebuilding the container"
+          -         echo ""
+          -         echo ""
+          -         echo "update=REQUIRED" > ${bamboo_build_working_directory}/status.txt
+          -     fi
+          - fi
+          #
+          - chmod 755 ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+          #
+          # Build LXC Directory for Build container
+          - cd ContainerImages/ubuntu
+          - rm -rf ${lxcTemplate}
+          - distrobuilder build-dir ${lxcYAML} ${lxcTemplate} -o image.release=${lxcReleaseName} -o image.architecture=${lxcArch}
+          #
+          # Add README.Sourceversion.txt
+          - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.txt
+          #
+          # Pack up image
+          - distrobuilder pack-lxc ${lxcYAML} ${lxcTemplate}
+          - ls -al
+          #
+          # Install new image
+          - lxc-stop -n ${lxcName} ?| true
+          - lxc-destroy -n ${lxcName} ?| true
+          - lxc-create -n ${lxcName} -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz
+          #
+          # Copy authorized_keys from LXC host root user to LXC image, root & ci users
+          # root user
+          - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
+          - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
+          - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          # ci user
+          - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
+          - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
+          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          #
+          # Fix nodename
+          - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "127.0.0.1   localhost" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "::1         localhost ip6-localhost ip6-loopback" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "ff02::1     ip6-allnodes" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "ff02::2     ip6-allrouters" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          - echo "${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          #
+          # Create new SSH Host keys
+          - lxc-start ${lxcName}
+          - lxc-attach ${lxcName} -- dpkg-reconfigure openssh-server
+          - lxc-attach ${lxcName} -- poweroff
+          #
+          - echo "update=DONE" > ${bamboo_build_working_directory}/status.txt
+
+    - inject-variables:
+        file: status.txt
+        scope: LOCAL
+        namespace: LXC
+
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          ####################################
+          # Start LXC Container
+          ####################################
+          #
+          #
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.update}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image build failed"
+          -   exit 1
+          - fi
+          #
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - echo "Booting newly built LXC container ${lxcName}"
+          #
+          # Download a FRR code
+          - rm -rf test
+          - mkdir test
+          - cd test
+          - wget -q https://ci1.netdef.org/browse/FRR-FRR/latestSuccessful/artifact/shared/SourceCode/frr-source.tar.gz
+          #
+          # Start a clone of the new container
+          - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - LXCvm=TEST_${LXCname}
+          - lxc-copy -n ${LXCname} -N ${LXCvm} -e -m bind=${bamboo_build_working_directory}/test:/home/ci/share
+          # Check and Wait for host to be pingable
+          - attempts=50
+          - reachable=0
+          - while [ $reachable -eq 0 ];
+          - do
+          -   sleep 1
+          -   host=`lxc-ls -f -F IPV4 --filter ${LXCvm} | grep -v IPV4`
+          -   ping -c1 -w1 $host > /dev/null 2> /dev/null
+          -   if [ "$?" -eq 0 ];
+          -   then
+          -     reachable=1
+          -   else
+          -     echo "Status=$?, IP=$host"
+          -     attempts=`expr $attempts - 1`
+          -     if [ "$attempts" -le 1 ];
+          -     then
+          -       echo "Ping Timeout - LXC start failed"
+          -       echo "boot=BOOTFAIL" >> ${bamboo_build_working_directory}/status.txt
+          -       exit 1
+          -     fi
+          -   fi    
+          - done
+          - attempts=40
+          - reachable=0
+          - while [ $reachable -eq 0 ];
+          - do
+          -   /usr/bin/ssh -o ConnectTimeout=2 ci@$host 'uname -a' > /dev/null 2> /dev/null
+          -   if [ "$?" -eq 0 ];
+          -   then
+          -     reachable=1
+          -   else
+          -     attempts=`expr $attempts - 1`
+          -     if [ "$attempts" -le 1 ];
+          -     then
+          -       echo "SSH Timeout - VM failed"
+          -       echo "boot=SSHFAIL" >> ${bamboo_build_working_directory}/status.txt
+          -       exit 1
+          -     fi
+          -     sleep 10
+          -   fi    
+          - done
+          - host="$(echo -e "${host}" | tr -d '[:space:]')"
+          - echo "LXChost=${host}" > ${bamboo_build_working_directory}/jobconfig.ini
+          - chmod 755 ${bamboo_build_working_directory}/jobconfig.ini
+          - echo "boot=DONE" >> ${bamboo_build_working_directory}/status.txt
+
+    - inject-variables:
+        file: status.txt
+        scope: LOCAL
+        namespace: LXC
+
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.boot}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image was not started (start failure)"
+          -   exit 0
+          - fi
+          #
+          ####################################
+          # Test build FRR on LXC Container
+          ####################################
+          #
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - . ${bamboo_build_working_directory}/jobconfig.ini
+          - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - LXCvm=TEST_${LXCname}
+          #
+          - ssh ci@${LXChost} 'sudo curl -s https://deb.frrouting.org/frr/keys.asc | sudo apt-key add -'
+          - ssh ci@${LXChost} 'echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) frr-stable | sudo tee -a /etc/apt/sources.list.d/frr.list'
+          - ssh ci@${LXChost} 'sudo apt update & sudo apt install -y libyang-dev'
+          #
+          - ssh ci@${LXChost} "tar xzf share/frr-source.tar.gz"
+          - ssh ci@${LXChost} "cd frr-source; ./bootstrap.sh"
+          - ssh ci@${LXChost} "cd frr-source; ./configure"
+          - ssh ci@${LXChost} "cd frr-source; make -j4"
+
+  final-tasks:
+     - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          ####################################
+          # LXC Container Stopping
+          ####################################
+          #
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.update}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image build failed"
+          -   exit 0
+          - fi
+          #
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - LXCvm=TEST_${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - lxc-stop -n ${LXCvm}
+
+
+# =============================================================================================================
+
+Topotest_Ubuntu1804_amd64:
   requirements:
     - buildnode_type: lxc
     - arch: amd64
@@ -209,20 +477,20 @@ Build_Ubuntu1804_amd64:
           - fi
           #
           ####################################
-          # LXC Container Testing
+          # Start LXC Container
           ####################################
           #
           #
-          ##- if [ "${bamboo.LXC.update}" = "SKIP" ]; then
-          ##-   echo "Skipped. LXC Image was not rebuilt"
-          ##-   exit 0
-          ##- elif [ "${bamboo.LXC.update}" != "DONE" ]; then
-          ##-   echo "Skipped. LXC Image build failed"
-          ##-   exit 1
-          ##- fi
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.update}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image build failed"
+          -   exit 1
+          - fi
           #
           - . ${bamboo_build_working_directory}/README.SourceVersion.txt
-          - echo "Testing newly built LXC container ${lxcName}"
+          - echo "Booting newly built LXC container ${lxcName}"
           #
           # Download a FRR code
           - rm -rf test
@@ -276,17 +544,16 @@ Build_Ubuntu1804_amd64:
           -   fi    
           - done
           - host="$(echo -e "${host}" | tr -d '[:space:]')"
-          - echo "LXChost=${host}" >> ${bamboo_build_working_directory}/jobconfig.ini
+          - echo "LXChost=${host}" > ${bamboo_build_working_directory}/jobconfig.ini
           - chmod 755 ${bamboo_build_working_directory}/jobconfig.ini
           - echo "boot=DONE" >> ${bamboo_build_working_directory}/status.txt
 
     - inject-variables:
         file: status.txt
-        scope: RESULT
-        namespace: LXCupdate
+        scope: LOCAL
+        namespace: LXC
 
-  final-tasks:
-     - script:
+    - script:
         interpreter: shell
         scripts:
           - "#!/usr/bin/env bash"
@@ -295,18 +562,47 @@ Build_Ubuntu1804_amd64:
           -     set -x
           - fi
           #
-          ####################################
-          # LXC Container Stopping
-          ####################################
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.boot}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image was not started (start failure)"
+          -   exit 0
+          - fi
           #
-          ##- if [ "${bamboo.LXC.update}" = "SKIP" ]; then
-          ##-   echo "Skipped. LXC Image was not rebuilt"
-          ##-   exit 0
-          ##- elif [ "${bamboo.LXC.update}" != "DONE" ]; then
-          ##-   echo "Skipped. LXC Image build failed"
-          ##-   exit 0
-          ##- fi
+          ####################################
+          # Test topotest on LXC Container
+          ####################################
           #
           - . ${bamboo_build_working_directory}/README.SourceVersion.txt
-          - LXCvm=TEST_${lxcTemplate}_${lxcRelease}_${lxcArch}
-          - lxc-stop -n ${LXCvm}
+          - . ${bamboo_build_working_directory}/jobconfig.ini
+          - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - LXCvm=TEST_${LXCname}
+          #
+          - ssh ci@${LXChost} "tar xzf share/frr-source.tar.gz"
+
+  # final-tasks:
+  #    - script:
+  #       interpreter: shell
+  #       scripts:
+  #         - "#!/usr/bin/env bash"
+  #         # For Debugging define the ci_script_verbose variable in config to some value
+  #         - if [ "$bamboo_ci_script_verbose" != "" ]; then
+  #         -     set -x
+  #         - fi
+  #         #
+  #         ####################################
+  #         # LXC Container Stopping
+  #         ####################################
+  #         #
+  #         ##- if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+  #         ##-   echo "Skipped. LXC Image was not rebuilt"
+  #         ##-   exit 0
+  #         ##- elif [ "${bamboo.LXC.update}" != "DONE" ]; then
+  #         ##-   echo "Skipped. LXC Image build failed"
+  #         ##-   exit 0
+  #         ##- fi
+  #         #
+  #         - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+  #         - LXCvm=TEST_${lxcTemplate}_${lxcRelease}_${lxcArch}
+  #         - lxc-stop -n ${LXCvm}
