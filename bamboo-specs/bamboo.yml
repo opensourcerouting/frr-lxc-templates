@@ -9,14 +9,23 @@ variables:
   bamboo_ci_script_verbose: YES
 
 stages:
+  - Version_Stage:
+      jobs:
+        - Save_Build_Version
   - Building_LXC:
       jobs:
         - Build_Ubuntu1804_amd64
 
-Build_Ubuntu1804_amd64:
+Save_Build_Version:
   requirements:
     - buildnode_type: lxc
-    - arch: amd64
+
+  artifacts:
+    -
+      name: SourceVersion
+      pattern: 'SourceVersion.txt'
+      required: true
+      shared: true
 
   tasks:
     - script:
@@ -25,9 +34,91 @@ Build_Ubuntu1804_amd64:
           - "#!/usr/bin/env bash"
           # For Debugging define the ci_script_verbose variable in config to some value
           - if [ "$bamboo_ci_script_verbose" != "" ]; then
-          -         set -x
+          -     set -x
           - fi
-          - pwd
-          - ls
-          - exit 0
+          #
+          # Define Architecture and Release
+          - rm -f README.SourceVersion.txt
+          - echo "# Version Information for this version as built by NetDEF CI system" >> README.SourceVersion.txt
+          - echo "# -----------------------------------------------------------------" >> README.SourceVersion.txt
+          - echo "#" >> README.SourceVersion.txt
+          - echo "# "
+          - if [ "$bamboo_github_repo" != "" ]; then
+          -     if [ "$bamboo_github_pullreq" != "" ]; then
+          -         echo "Source_GIT_URL='https://github.com/${bamboo_github_repo}/pull/${bamboo_github_pullreq}'" >> README.SourceVersion.txt
+          -     else
+          -         echo "Source_GIT_URL='https://github.com/${bamboo_github_repo}'" >> README.SourceVersion.txt
+          -     fi
+          - else
+          -     echo "Source_GIT_URL='GitHub (${bamboo_planRepository_1_repositoryUrl})'" >> README.SourceVersion.txt
+          - fi
+          - gitrev=$(git --git-dir .git rev-parse HEAD 2>/dev/null)
+          - echo "Source_GIT_Commit=${gitrev}" >> README.SourceVersion.txt
+          - if [ "${bamboo_github_branch}" = "" ]; then
+          -     echo "Source_GIT_Branch='${bamboo_repository_branch_name}'" >> README.SourceVersion.txt
+          - else
+          -     echo "Source_GIT_Branch='${bamboo_github_branch}'" >> README.SourceVersion.txt
+          - fi
+          - describe=$(git --git-dir .git describe 2>/dev/null)
+          - version=`echo ${describe} | cut -d'-' -f 2`
+          - if [ "${describe}" = "" ]; then
+          -     describe="${bamboo_repository_branch_name}-$(git --git-dir .git describe --always)"
+          - fi
+          - echo "Source_GIT_Describ=${describe}" >> README.SourceVersion.txt
+          - gittime=$(git --git-dir .git log -n1 --format="%ct")
+          - echo "Source_GIT_CommitTime_UTC='$(TZ=GMT date -d @${gittime} +%Y%m%d.%H%M%S)'"  >> README.SourceVersion.txt
+          - echo "Source_GIT_CommitDate_UTC='$(TZ=GMT date -d @${gittime} +%Y%m%d)'"  >> README.SourceVersion.txt
+          - echo "Source_DejaGNU_tests_SHA='$(find tests -type f -exec shasum -p {} \; | sort -k1.42 -d -f | shasum -p | awk '{print $1;}' )'"  >> README.SourceVersion.txt
+          - echo -n "CI_Build_Result_URL=" >> README.SourceVersion.txt
+          - echo ${bamboo_resultsUrl} | sed -e 's|-CHECKOUT-|-|g' >> README.SourceVersion.txt
+          - echo "CI_Build_TimeStamp='${bamboo_buildTimeStamp}'" >> README.SourceVersion.txt
+          - echo "CI_Build_TimeStamp_UTC='$(date -d ${bamboo_buildTimeStamp} -u +%Y%m%d.%H%M%S)'" >> README.SourceVersion.txt
+          - echo "CI_Build_DateStamp_UTC='$(date -d ${bamboo_buildTimeStamp} -u +%Y%m%d)'" >> README.SourceVersion.txt
+          - echo "Code_Version=${version}"  >> README.SourceVersion.txt
+          - if [ "${bamboo_github_pullreq}" != "" ]; then
+          -     echo "Github_Pull_Request='${bamboo_github_pullreq}'" >> README.SourceVersion.txt
+          - fi
+          - if [ "${bamboo_github_base_sha}" != "" ]; then
+          -     echo "Github_Merge_Base_Commit='${bamboo_github_base_sha}'" >> README.SourceVersion.txt
+          - fi
 
+
+Build_Ubuntu1804_amd64:
+  requirements:
+    - buildnode_type: lxc
+    - arch: amd64
+
+  tasks:
+    - artifact-download:
+        source-plan: TESTING-TESTLXC
+        artifacts:
+          - name: SourceVersion
+
+  tasks:
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          - lxcReleaseName=bionic
+          - lxcRelease=ubuntu1804
+          - lxcArch=amd64
+          - lxcTemplate=topotest
+          #
+          # Define Architecture and Release
+          - echo "# " >> README.SourceVersion.txt
+          - echo "lxcReleaseName=${lxcReleaseName}" >> README.SourceVersion.txt
+          - echo "lxcRelease=${ubuntu1804}" >> README.SourceVersion.txt
+          - echo "lxcArch=${lxcArch}" >> README.SourceVersion.txt
+          - echo "lxcTemplate=${lxcTemplate}" >> README.SourceVersion.txt
+          #
+          # Build LXC Directory for Build container
+          - cd ContainerImages/ubuntu
+          # distrobuilder build-dir topotest_ubuntu1804_amd64.yaml topotest -o image.release=${lxcRelease}
+          - echo ""
+          #
+          - exit 0
