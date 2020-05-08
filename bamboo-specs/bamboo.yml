@@ -23,11 +23,13 @@ Save_Build_Version:
   artifacts:
     -
       name: SourceVersion
-      pattern: 'SourceVersion.txt'
+      pattern: 'README.SourceVersion.txt'
       required: true
       shared: true
 
   tasks:
+    - clean
+
     - script:
         interpreter: shell
         scripts:
@@ -68,13 +70,11 @@ Save_Build_Version:
           - gittime=$(git --git-dir .git log -n1 --format="%ct")
           - echo "Source_GIT_CommitTime_UTC='$(TZ=GMT date -d @${gittime} +%Y%m%d.%H%M%S)'"  >> README.SourceVersion.txt
           - echo "Source_GIT_CommitDate_UTC='$(TZ=GMT date -d @${gittime} +%Y%m%d)'"  >> README.SourceVersion.txt
-          - echo "Source_DejaGNU_tests_SHA='$(find tests -type f -exec shasum -p {} \; | sort -k1.42 -d -f | shasum -p | awk '{print $1;}' )'"  >> README.SourceVersion.txt
           - echo -n "CI_Build_Result_URL=" >> README.SourceVersion.txt
           - echo ${bamboo_resultsUrl} | sed -e 's|-CHECKOUT-|-|g' >> README.SourceVersion.txt
           - echo "CI_Build_TimeStamp='${bamboo_buildTimeStamp}'" >> README.SourceVersion.txt
           - echo "CI_Build_TimeStamp_UTC='$(date -d ${bamboo_buildTimeStamp} -u +%Y%m%d.%H%M%S)'" >> README.SourceVersion.txt
           - echo "CI_Build_DateStamp_UTC='$(date -d ${bamboo_buildTimeStamp} -u +%Y%m%d)'" >> README.SourceVersion.txt
-          - echo "Code_Version=${version}"  >> README.SourceVersion.txt
           - if [ "${bamboo_github_pullreq}" != "" ]; then
           -     echo "Github_Pull_Request='${bamboo_github_pullreq}'" >> README.SourceVersion.txt
           - fi
@@ -94,7 +94,6 @@ Build_Ubuntu1804_amd64:
         artifacts:
           - name: SourceVersion
 
-  tasks:
     - script:
         interpreter: shell
         scripts:
@@ -118,7 +117,45 @@ Build_Ubuntu1804_amd64:
           #
           # Build LXC Directory for Build container
           - cd ContainerImages/ubuntu
-          # distrobuilder build-dir topotest_ubuntu1804_amd64.yaml topotest -o image.release=${lxcRelease}
-          - echo ""
+          - lxcName=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          - rm -rf ${lxcTemplate}
+          - distrobuilder build-dir ${lxcTemplate}_ubuntu1804_amd64.yaml ${lxcTemplate} -o image.release=${lxcReleaseName} -o image.arch=${lxcArch}
+          #
+          # Add README.Sourceversion.txt
+          - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.txt
+          #
+          # Pack up image
+          - distrobuilder build-dir ${lxcTemplate}_ubuntu1804_amd64.yaml ${lxcTemplate}
+          #
+          # Install new image
+          - lxc-stop -n ${lxcName} ?| true
+          - lxc-destroy -n ${lxcName} ?| true
+          - lxc-create -n ${lxcName} -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz
+          # Add authorized_keys to LXC images
+          # root user
+          - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
+          - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
+          - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          # ci user
+          - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
+          - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
+          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          #
+          # Fix nodename
+          - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "127.0.0.1   localhost" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "::1         localhost ip6-localhost ip6-loopback" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "ff02::1     ip6-allnodes" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "ff02::2     ip6-allrouters" >> /var/lib/lxc/${lxcName}/rootfs/etc/hostname"
+          - echo "${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
+          #
+          # Add SSH Host keys
+          - lxc-start ${lxctemplate}
+          - lxc-attach ${lxctemplate} -- dpkg-reconfigure openssh-server
+          - lxc-attach ${lxctemplate} -- poweroff
           #
           - exit 0
