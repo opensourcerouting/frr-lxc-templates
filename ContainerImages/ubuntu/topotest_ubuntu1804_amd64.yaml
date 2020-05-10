@@ -27,8 +27,6 @@ targets:
     create-message: |-
       You just created an {{ image.description }} container.
 
-      SSH Server enabled, but no host keys. Copy keys or run
-      dpkg-reconfigure openssh-server
       User 'ci' with password-less sudo access is added.
       No default root or ci user password are set.
 
@@ -181,8 +179,6 @@ packages:
       - libc-ares2
       - libsnmp30
       - mininet
-      - openssh-client
-      - openssh-server
       - python-ipaddr
       - python-pip
       action: install
@@ -252,9 +248,6 @@ actions:
       mount -o bind / /mnt
       rm -rf /mnt/run/*
       umount /mnt
-
-      # Remove SSH Host keys
-      rm /etc/ssh/ssh*key*
 
       # Cleanup temporary shadow paths
       rm /etc/*-
