@@ -155,8 +155,8 @@ Build_Ubuntu1804_amd64:
           - rm -rf ${lxcTemplate}
           - distrobuilder build-dir ${lxcYAML} ${lxcTemplate} -o image.release=${lxcReleaseName} -o image.architecture=${lxcArch}
           #
-          # Add README.Sourceversion.txt
-          - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.txt
+          # Add README.Sourceversion.txt  (as .temp until all is successful)
+          - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.temp
           #
           # Pack up image
           - distrobuilder pack-lxc ${lxcYAML} ${lxcTemplate}
@@ -208,6 +208,7 @@ Build_Ubuntu1804_amd64:
           -     if [ "$attempts" -le 1 ];
           -     then
           -       echo "Ping Timeout - LXC start failed"
+          -       lxc-stop ${lxcName}
           -       echo "update=FAILED" > ${bamboo_build_working_directory}/status.txt
           -       exit 1
           -     fi
@@ -339,14 +340,37 @@ Build_Ubuntu1804_amd64:
           - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
           - LXCvm=TEST_${LXCname}
           #
-          - ssh ci@${LXChost} 'sudo curl -s https://deb.frrouting.org/frr/keys.asc | sudo apt-key add -'
-          - ssh ci@${LXChost} 'echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) frr-stable | sudo tee -a /etc/apt/sources.list.d/frr.list'
-          - ssh ci@${LXChost} 'sudo apt update & sudo apt install -y libyang-dev'
+          - ssh -t root@${LXChost} 'curl -s https://deb.frrouting.org/frr/keys.asc | sudo DEBIAN_FRONTEND=noninteractive apt-key add -'
+          - ssh root@${LXChost} 'echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) frr-stable | tee -a /etc/apt/sources.list.d/frr.list'
+          - ssh root@${LXChost} 'DEBIAN_FRONTEND=noninteractive apt update'
+          - ssh root@${LXChost} 'DEBIAN_FRONTEND=noninteractive apt install -y libyang-dev'
           #
           - ssh ci@${LXChost} "tar xzf share/frr-source.tar.gz"
           - ssh ci@${LXChost} "cd frr-source; ./bootstrap.sh"
           - ssh ci@${LXChost} "cd frr-source; ./configure"
           - ssh ci@${LXChost} "cd frr-source; make -j4"
+
+    - script:
+        interpreter: shell
+        scripts:
+          - "#!/usr/bin/env bash"
+          # For Debugging define the ci_script_verbose variable in config to some value
+          - if [ "$bamboo_ci_script_verbose" != "" ]; then
+          -     set -x
+          - fi
+          #
+          - if [ "${bamboo.LXC.update}" = "SKIP" ]; then
+          -   echo "Skipped. LXC Image was not rebuilt"
+          -   exit 0
+          - elif [ "${bamboo.LXC.boot}" != "DONE" ]; then
+          -   echo "Skipped. LXC Image was not started (start failure)"
+          -   exit 0
+          - fi
+          #
+          - . ${bamboo_build_working_directory}/README.SourceVersion.txt
+          - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
+          # Rename README.SourceVersion.temp to README.SourceVersion.txt to mark working container
+          - mv /var/lib/lxc/${LXCname}/rootfs/etc/README.SourceVersion.temp /var/lib/lxc/${LXCname}/rootfs/etc/README.SourceVersion.txt
 
   final-tasks:
      - script:
