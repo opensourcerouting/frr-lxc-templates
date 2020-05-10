@@ -25,8 +25,6 @@ targets:
     create-message: |-
       You just created an {{ image.description }} container.
 
-      SSH Server enabled, but no host keys. Copy keys or run
-      dpkg-reconfigure openssh-server
       User 'ci' with password-less sudo access is added.
       No default root or ci user password are set.
 
@@ -208,8 +206,6 @@ packages:
       - libtool
       - lintian
       - make
-      - openssh-client
-      - openssh-server
       - pkg-config
       - protobuf-c-compiler
       - psmisc
@@ -282,9 +278,6 @@ actions:
       mount -o bind / /mnt
       rm -rf /mnt/run/*
       umount /mnt
-
-      # Remove SSH Host keys
-      rm /etc/ssh/ssh*key*
 
       # Cleanup temporary shadow paths
       rm /etc/*-

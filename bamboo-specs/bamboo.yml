@@ -191,7 +191,7 @@ Build_Ubuntu1804_amd64:
           #
           # Create new SSH Host keys
           - lxc-start ${lxcName}
-          - lxc-attach ${lxcName} -- dpkg-reconfigure openssh-server
+          - lxc-attach ${lxcName} -- apt install -y openssh-server
           - lxc-attach ${lxcName} -- poweroff
           #
           - echo "update=DONE" > ${bamboo_build_working_directory}/status.txt
