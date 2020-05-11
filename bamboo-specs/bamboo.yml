@@ -159,6 +159,7 @@ Build_Ubuntu1804_amd64:
           - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.temp
           #
           # Pack up image
+          - export XZ_DEFAULTS="-T 0"
           - distrobuilder pack-lxc ${lxcYAML} ${lxcTemplate}
           - ls -al
           #
@@ -220,6 +221,7 @@ Build_Ubuntu1804_amd64:
           - lxc-attach ${lxcName} -- apt install -y openssh-server
           # And power it off. Finish building the container
           - lxc-attach ${lxcName} -- poweroff
+          - sleep 10
           #
           - echo "update=DONE" > ${bamboo_build_working_directory}/status.txt
 
@@ -412,6 +414,12 @@ Topotest_Ubuntu1804_amd64:
         artifacts:
           - name: SourceVersion
 
+    - artifact-download:
+        source-plan: FRR-FRR
+        artifacts:
+          - name: SourceCode
+          - name: Ubuntu 18.04 x86_64 Packages
+
     - script:
         interpreter: shell
         scripts:
@@ -475,6 +483,7 @@ Topotest_Ubuntu1804_amd64:
           - cp ${bamboo_build_working_directory}/README.SourceVersion.txt ${lxcTemplate}/etc/README.SourceVersion.txt
           #
           # Pack up image
+          - export XZ_DEFAULTS="-T 0"
           - distrobuilder pack-lxc ${lxcYAML} ${lxcTemplate}
           - ls -al
           #
@@ -536,6 +545,7 @@ Topotest_Ubuntu1804_amd64:
           - lxc-attach ${lxcName} -- apt install -y openssh-server
           # And power it off. Finish building the container
           - lxc-attach ${lxcName} -- poweroff
+          - sleep 10
           #
           - echo "update=DONE" > ${bamboo_build_working_directory}/status.txt
 
@@ -569,16 +579,16 @@ Topotest_Ubuntu1804_amd64:
           - . ${bamboo_build_working_directory}/README.SourceVersion.txt
           - echo "Booting newly built LXC container ${lxcName}"
           #
-          # Download a FRR code
+          # Copy FRR code to shared directory
           - rm -rf test
           - mkdir test
-          - cd test
-          - wget -q https://ci1.netdef.org/browse/FRR-FRR/latestSuccessful/artifact/shared/SourceCode/frr-source.tar.gz
+          - mv ${bamboo_build_working_directory}/frr-source.tar.gz ${bamboo_build_working_directory}/test/
+          - mv ${bamboo_build_working_directory}/*.deb ${bamboo_build_working_directory}/test/
           #
           # Start a clone of the new container
           - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
           - LXCvm=TEST_${LXCname}
-          - lxc-copy -n ${LXCname} -N ${LXCvm} -e -m bind=${bamboo_build_working_directory}/test:/home/ci/share
+          - lxc-copy -n ${LXCname} -N ${LXCvm} -e -m bind=${bamboo_build_working_directory}/test:/root/share
           # Check and Wait for host to be pingable
           - attempts=50
           - reachable=0
@@ -656,7 +666,7 @@ Topotest_Ubuntu1804_amd64:
           - LXCname=${lxcTemplate}_${lxcRelease}_${lxcArch}
           - LXCvm=TEST_${LXCname}
           #
-          - ssh ci@${LXChost} "tar xzf share/frr-source.tar.gz"
+          - ssh root@${LXChost} "tar xzf share/frr-source.tar.gz"
 
     # - script:
     #     interpreter: shell
