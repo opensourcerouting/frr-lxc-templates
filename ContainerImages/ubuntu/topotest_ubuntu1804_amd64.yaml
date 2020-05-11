@@ -171,6 +171,7 @@ packages:
   sets:
     - packages:
       - apt-transport-https
+      - curl
       - dnsutils
       - gdb
       - iproute2

@@ -172,6 +172,7 @@ packages:
       - chrpath
       - cmake
       - coreutils
+      - curl
       - debhelper
       - dejagnu
       - devscripts
