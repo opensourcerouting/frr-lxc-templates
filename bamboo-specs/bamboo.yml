@@ -96,6 +96,11 @@ Build_Ubuntu1804_amd64:
         artifacts:
           - name: SourceVersion
 
+    - artifact-download:
+        source-plan: FRR-FRR
+        artifacts:
+          - name: SourceCode
+
     - script:
         interpreter: shell
         scripts:
@@ -265,8 +270,7 @@ Build_Ubuntu1804_amd64:
           # Download a FRR code
           - rm -rf test
           - mkdir test
-          - cd test
-          - wget -q https://ci1.netdef.org/browse/FRR-FRR/latestSuccessful/artifact/shared/SourceCode/frr-source.tar.gz
+          - mv ${bamboo_build_working_directory}/frr-source.tar.gz ${bamboo_build_working_directory}/test/
           #
           - sync
           - sleep 10
