@@ -233,7 +233,7 @@ Build_Ubuntu1804_amd64:
           # And power it off. Finish building the container
           - lxc-attach ${lxcName} -- poweroff
           - sleep 10
-          - lxc-stop ${lxcName}
+          - lxc-stop ${lxcName} ?| true
           #
           - echo "update=DONE" > ${bamboo_build_working_directory}/status.txt
 
