@@ -219,7 +219,6 @@ packages:
       - python3-sphinx
       - sudo
       - texinfo
-      - texlive-generic-recommended
       - texlive-latex-base
       - vim
       - zlib1g-dev
@@ -236,6 +235,23 @@ packages:
       action: install
       releases:
         - bionic
+
+    - packages:
+      - texlive-generic-recommended
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+
+    - packages:
+      - texlive
+      action: install
+      releases:
+        - focal
 
     - packages:
       - geoip-database
