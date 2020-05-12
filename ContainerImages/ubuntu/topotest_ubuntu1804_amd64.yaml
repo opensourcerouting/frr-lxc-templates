@@ -1,6 +1,8 @@
-# Tested on for
-#   Ubuntu 18.04 amd64  (bionic)
+# Tested on
 #   Ubuntu 16.04 amd64  (xenial)
+#   Ubuntu 18.04 amd64  (bionic)
+#
+#  Does not work on Ubuntu 20.04 (mininet needs python2)
 #
 # Use Distrobuilder (see README.md) to create the LXC images
 # Default output is Ubuntu 18.04 on x86_64 architucture

@@ -1,6 +1,7 @@
-# Tested on for
-#   Ubuntu 18.04 amd64       (bionic)
+# Tested on
 #   Ubuntu 16.04 amd64/i386  (xenial)
+#   Ubuntu 18.04 amd64       (bionic)
+#   Ubuntu 20.04 amd64       (focal)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -91,6 +92,7 @@ files:
      - bionic
      - cosmic
      - disco
+     - focal
 
  - path: /etc/network/interfaces
    generator: dump
