@@ -100,6 +100,8 @@ Build_Ubuntu1804_amd64:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -438,6 +440,8 @@ Topotest_Ubuntu1804_amd64:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -798,6 +802,8 @@ Build_Ubuntu1604_amd64:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -1136,6 +1142,8 @@ Topotest_Ubuntu1604_amd64:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -1496,6 +1504,8 @@ Build_Ubuntu2004_amd64:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -1834,6 +1844,8 @@ Topotest_Ubuntu1604_i386:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
@@ -2193,6 +2205,8 @@ Build_Ubuntu1604_i386:
     - arch: amd64
 
   tasks:
+    - clean
+
     - artifact-download:
         source-plan: TESTING-TESTLXC
         artifacts:
