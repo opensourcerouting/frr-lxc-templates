@@ -197,16 +197,18 @@ Build_Ubuntu1804_amd64:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -540,16 +542,18 @@ Topotest_Ubuntu1804_amd64:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -899,16 +903,18 @@ Build_Ubuntu1604_amd64:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -1242,16 +1248,18 @@ Topotest_Ubuntu1604_amd64:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -1601,16 +1609,18 @@ Build_Ubuntu2004_amd64:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -1944,16 +1954,18 @@ Topotest_Ubuntu1604_i386:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -2302,16 +2314,18 @@ Build_Ubuntu1604_i386:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -2672,16 +2686,18 @@ Build_Ubuntu1804_arm8:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -3015,16 +3031,18 @@ Topotest_Ubuntu1804_arm8:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -3374,16 +3392,18 @@ Build_Ubuntu1604_arm8:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -3717,16 +3737,18 @@ Topotest_Ubuntu1604_arm8:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -4076,16 +4098,18 @@ Build_Ubuntu2004_arm8:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -4419,16 +4443,18 @@ Topotest_Ubuntu1604_arm7:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
@@ -4777,16 +4803,18 @@ Build_Ubuntu1604_arm7:
           # Copy authorized_keys from LXC host root user to LXC image, root & ci users
           # root user
           - mkdir /var/lib/lxc/${lxcName}/rootfs/root/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/root/.ssh/authorized_keys
           - chown -R root:root /var/lib/lxc/${lxcName}/rootfs/root/.ssh
           # ci user
+          - ciusr=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f3`
+          - cigrp=`cat /var/lib/lxc/${lxcName}/rootfs/etc/passwd | grep ^ci | cut -d':' -f4`
           - mkdir /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
-          - chown 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chmod 700 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           - cp ~/.ssh/id_rsa.pub /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
           - chmod 600 /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh/authorized_keys
-          - chown -R ci:ci /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
+          - chown -R ${ciusr}:${cigrp} /var/lib/lxc/${lxcName}/rootfs/home/ci/.ssh
           #
           # Fix nodename
           - echo "127.0.1.1   ${lxcName}" > /var/lib/lxc/${lxcName}/rootfs/etc/hostname
