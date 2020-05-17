@@ -209,6 +209,7 @@ packages:
       - libtool
       - lintian
       - make
+      - openssh-server
       - pkg-config
       - protobuf-c-compiler
       - psmisc

@@ -182,6 +182,7 @@ packages:
       - libc-ares2
       - libsnmp30
       - mininet
+      - openssh-server
       - python-ipaddr
       - python-pip
       action: install
