@@ -1,6 +1,6 @@
 # Tested on
-#   Ubuntu 16.04 amd64  (xenial)
-#   Ubuntu 18.04 amd64  (bionic)
+#   Ubuntu 16.04 amd64/i386  (xenial)
+#   Ubuntu 18.04 amd64       (bionic)
 #
 #  Does not work on Ubuntu 20.04 (mininet needs python2)
 #

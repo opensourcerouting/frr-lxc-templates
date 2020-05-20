@@ -1,7 +1,7 @@
 # Tested on
-#   Ubuntu 16.04 amd64/i386  (xenial)
-#   Ubuntu 18.04 amd64       (bionic)
-#   Ubuntu 20.04 amd64       (focal)
+#   Ubuntu 16.04 aarch64/armhf  (xenial)
+#   Ubuntu 18.04 aarch64/armhf  (bionic)
+#   Ubuntu 20.04 aarch64        (focal)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -11,7 +11,7 @@ image:
   release: bionic
   description: |-
     Ubuntu {{ image.release }}
-  architecture: x86_64
+  architecture: aarch64
 
 source:
   downloader: debootstrap
@@ -303,6 +303,4 @@ actions:
       rm /etc/*-
 
 mappings:
-  architectures:
-    amd64: x86_64
   architecture_map: debian

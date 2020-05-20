@@ -1,6 +1,6 @@
 # Tested on
-#   Ubuntu 16.04 amd64  (xenial)
-#   Ubuntu 18.04 amd64  (bionic)
+#   Ubuntu 16.04 aarch64/armhf  (xenial)
+#   Ubuntu 18.04 aarch64/armhf  (bionic)
 #
 #  Does not work on Ubuntu 20.04 (mininet needs python2)
 #
@@ -14,7 +14,7 @@ image:
   release: bionic
   description: |-
     Ubuntu {{ image.release }}
-  architecture: x86_64
+  architecture: aarch64
 
 source:
   downloader: debootstrap
