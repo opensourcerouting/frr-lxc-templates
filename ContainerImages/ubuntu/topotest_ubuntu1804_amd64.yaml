@@ -234,6 +234,9 @@ actions:
       # Disable OpenVSwitch startup - we provide our
       # own as part of the topotests
       systemctl disable openvswitch-switch
+      rm -f /lib/systemd/system/ovsdb-server.service
+      rm -f /lib/systemd/system/ovs-vswitchd.service
+      rm -f /lib/systemd/system/openvswitch-switch.service
 
       # Upgrade PIP to current
       /usr/bin/pip install --upgrade pip
