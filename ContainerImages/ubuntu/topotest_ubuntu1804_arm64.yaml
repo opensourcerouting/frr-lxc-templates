@@ -251,6 +251,9 @@ actions:
       /usr/local/bin/pip install 'exabgp==3.4.17'
       useradd -d /var/run/exabgp/ -s /bin/false exabgp
 
+      # Install pytest-html
+      /usr/local/bin/pip install pytest-html
+      
       # Cleanup underlying /run
       mount -o bind / /mnt
       rm -rf /mnt/run/*
