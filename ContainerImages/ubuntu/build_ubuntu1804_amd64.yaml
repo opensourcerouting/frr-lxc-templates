@@ -165,6 +165,7 @@ packages:
 
   sets:
     - packages:
+      git-buildpackage pristine-tar
       - apt-transport-https
       - autoconf
       - automake
@@ -186,6 +187,7 @@ packages:
       - flex
       - gawk
       - git
+      - git-buildpackage
       - groff
       - install-info
       - iproute2
@@ -211,6 +213,7 @@ packages:
       - make
       - openssh-server
       - pkg-config
+      - pristine-tar
       - protobuf-c-compiler
       - psmisc
       - python3-dev
