@@ -220,6 +220,7 @@ packages:
       - python3-pytest
       - python3-sphinx
       - python3-sphinx
+      - snapcraft
       - sudo
       - texinfo
       - texlive-latex-base
