@@ -165,7 +165,6 @@ packages:
 
   sets:
     - packages:
-      git-buildpackage pristine-tar
       - apt-transport-https
       - autoconf
       - automake
