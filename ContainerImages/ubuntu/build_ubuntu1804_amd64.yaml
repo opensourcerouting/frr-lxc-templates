@@ -220,7 +220,6 @@ packages:
       - python3-pytest
       - python3-sphinx
       - python3-sphinx
-      - snapcraft
       - sudo
       - texinfo
       - texlive-latex-base
@@ -256,6 +255,13 @@ packages:
       action: install
       releases:
         - focal
+
+    - packages:
+      - snapcraft
+      action: install
+      releases:
+        - trusty
+        - xenial
 
     - packages:
       - geoip-database
