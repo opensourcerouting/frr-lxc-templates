@@ -266,7 +266,6 @@ packages:
     - packages:
       - geoip-database
       - hicolor-icon-theme
-      - python
       - tcl-expect
       - tcl8.6
       - x11-common
