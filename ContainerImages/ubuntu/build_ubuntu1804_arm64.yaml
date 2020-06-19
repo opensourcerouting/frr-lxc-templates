@@ -260,7 +260,7 @@ packages:
       - snapcraft
       action: install
       releases:
-        - trusty
+        - bionic
         - xenial
 
     - packages:
