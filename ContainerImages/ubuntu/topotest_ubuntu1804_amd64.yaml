@@ -185,6 +185,7 @@ packages:
       - openssh-server
       - python-ipaddr
       - python-pip
+      - patch
       action: install
 
     - packages:
