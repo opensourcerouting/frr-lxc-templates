@@ -153,6 +153,7 @@ packages:
       - flex
       - gawk
       - git
+      - git-buildpackage
       - groff
       - install-info
       - iproute2
@@ -160,6 +161,7 @@ packages:
       - libc-ares-dev
       - libcap-dev
       - libcmocka-dev
+      - libelf-dev
       - libjson-c-dev
       - libmnl-dev
       - libncurses5-dev
