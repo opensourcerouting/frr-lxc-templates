@@ -1,0 +1,270 @@
+# Tested on
+#   Not yet...
+#
+# Other Distro's and architectures are untested, but may work
+
+image:
+  name: debian-buildfrr
+  distribution: debian
+  release: buster
+  description: |-
+    Debian {{ image.release }}
+  architecture: x86_64
+
+source:
+  downloader: debootstrap
+  url: http://deb.debian.org/debian
+  keyserver: hkps.pool.sks-keyservers.net
+  keys:
+    # Keys from https://ftp-master.debian.org/keys.html
+    #
+    # Debian 10 buster
+    - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
+    #
+    # Debian 9 stretch
+    - 0x067E3C456BAE240ACEE88F6FEF0F382A1A7B6500
+    #
+    # Debian 8 jessie
+    - 0x75DDC3C4A499F1A18CB5F3C8CBF8D6FD518E17E1  
+
+targets:
+  lxc:
+    create-message: |-
+      You just created an {{ image.description }} container.
+
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_personality }}
+
+files:
+ - path: /etc/hostname
+   generator: hostname
+
+ - path: /etc/hosts
+   generator: hosts
+
+ - path: /etc/resolvconf/resolv.conf.d/original
+   generator: remove
+
+ - path: /etc/resolvconf/resolv.conf.d/tail
+   generator: remove
+
+ - path: /etc/machine-id
+   generator: remove
+
+ - path: /var/lib/dbus/machine-id
+   generator: remove
+
+ - path: /etc/network/interfaces
+   generator: dump
+   content: |-
+     # This file describes the network interfaces available on your system
+     # and how to activate them. For more information, see interfaces(5).
+
+     # The loopback network interface
+     auto lo
+     iface lo inet loopback
+
+     auto eth0
+     iface eth0 inet dhcp
+
+     source /etc/network/interfaces.d/*
+   types:
+     - container
+   variants:
+     - default
+
+ - name: meta-data
+   generator: cloud-init
+   variants:
+    - cloud
+
+ - name: network-config
+   generator: cloud-init
+   variants:
+    - cloud
+
+ - name: user-data
+   generator: cloud-init
+   variants:
+    - cloud
+
+ - name: vendor-data
+   generator: cloud-init
+   variants:
+    - cloud
+
+
+packages:
+  manager: apt
+  update: true
+  cleanup: true
+
+  repositories:
+  - name: sources.list
+    url: |-
+      deb http://deb.debian.org/debian {{ image.release }} main
+      {% if image.release != "sid" and image.release != "bullseye" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+
+  sets:
+    - packages:
+      - apt-transport-https
+      - autoconf
+      - automake
+      - autopoint
+      - bison
+      - build-essential
+      - chrpath
+      - cmake
+      - coreutils
+      - curl
+      - debhelper
+      - dejagnu
+      - devscripts
+      - dh-autoreconf
+      - dh-systemd
+      - doxygen
+      - equivs
+      - fakeroot
+      - flex
+      - gawk
+      - git
+      - groff
+      - install-info
+      - iproute2
+      - iputils-ping
+        # - language-pack-en
+      - libc-ares-dev
+      - libcap-dev
+      - libcmocka-dev
+      - libjson-c-dev
+      - libmnl-dev
+      - libncurses5-dev
+      - libpam-dev
+      - libpcre3-dev 
+      - libprotobuf-c-dev
+      - libreadline-dev
+      - libsensors4-dev
+      - libsnmp-base
+      - libsnmp-dev
+      - libssh-dev
+      - libsystemd-dev
+      - libtool
+      - lintian
+      - locales
+      - make
+      - pkg-config
+      - protobuf-c-compiler
+      - psmisc
+      - python3-dev
+      - python3-dev
+      - python3-pytest
+      - python3-sphinx
+      - python3-sphinx
+      - sudo
+      - texinfo
+        #- texlive-latex-base
+      - vim
+      - zlib1g-dev
+      action: install
+
+    - packages:
+      - libprotoc17
+      action: install
+      releases:
+        - buster
+
+    - packages:
+      - libprotoc10
+      action: install
+      releases:
+        - stretch
+
+    - packages:
+      - libprotoc9
+      action: install
+      releases:
+        - jessie
+
+    - packages:
+      - geoip-database
+      - hicolor-icon-theme
+      - python
+      - tcl-expect
+      - tcl8.6
+      - x11-common
+      - xauth
+      - xdg-utils
+      action: remove
+
+    - packages:
+      - cloud-init
+      action: install
+      variants:
+       - cloud
+
+actions:
+  - trigger: post-update
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Disable networkd (unused)
+      systemctl mask systemd-networkd.service
+      systemctl mask systemd-networkd.socket
+      systemctl mask systemd-networkd-wait-online.service
+
+      # Make sure the locale is built and functional
+      echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+      locale-gen en_US.UTF-8 UTF-8
+      update-locale LANG=en_US.UTF-8
+
+      # Cleanup underlying /run
+      mount -o bind / /mnt
+      rm -rf /mnt/run/*
+      umount /mnt
+
+      # Cleanup temporary shadow paths
+      rm /etc/*-
+
+mappings:
+  architectures:
+    amd64: x86_64
+  architecture_map: debian
