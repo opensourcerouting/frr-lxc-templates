@@ -157,7 +157,6 @@ packages:
       - install-info
       - iproute2
       - iputils-ping
-        # - language-pack-en
       - libc-ares-dev
       - libcap-dev
       - libcmocka-dev
@@ -177,17 +176,16 @@ packages:
       - lintian
       - locales
       - make
+      - openssh-server
       - pkg-config
+      - pristine-tar
       - protobuf-c-compiler
       - psmisc
       - python3-dev
-      - python3-dev
       - python3-pytest
-      - python3-sphinx
       - python3-sphinx
       - sudo
       - texinfo
-        #- texlive-latex-base
       - vim
       - zlib1g-dev
       action: install
