@@ -186,6 +186,7 @@ packages:
       - python-ipaddr
       - python-pip
       - patch
+      - snmp
       action: install
 
     - packages:
@@ -251,6 +252,9 @@ actions:
       # Install ExaBGP 3.4.17 with PIP
       /usr/local/bin/pip install 'exabgp==3.4.17'
       useradd -d /var/run/exabgp/ -s /bin/false exabgp
+
+      # Install scapy for topotests
+      /usr/local/bin/pip install 'scapy'
 
       # Install pytest-html
       /usr/local/bin/pip install pytest-html
