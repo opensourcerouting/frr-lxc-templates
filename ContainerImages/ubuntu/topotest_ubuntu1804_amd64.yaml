@@ -181,6 +181,7 @@ packages:
       - iputils-ping
       - libc-ares2
       - libsnmp30
+      - lsof
       - mininet
       - openssh-server
       - python-ipaddr

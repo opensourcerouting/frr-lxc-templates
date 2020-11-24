@@ -177,6 +177,7 @@ packages:
       - libtool
       - lintian
       - locales
+      - lsof
       - make
       - openssh-server
       - pkg-config
