@@ -188,6 +188,8 @@ packages:
       - python-pip
       - patch
       - snmp
+      - snmp-mibs-downloader
+      - snmpd
       action: install
 
     - packages:
@@ -260,7 +262,26 @@ actions:
       # Install pytest-html
       /usr/local/bin/pip install pytest-html
       
+      # Enable SNMP MIBS
+      sed -i 's/#\smibs.*/mibs +ALL/g' /etc/snmp/snmp.conf
+
+      # Download extra SNMP MIBS
+      download-mibs
+
+      # Get additional SNMP MIBS
+      if [ -d "/usr/share/snmp/mibs/ietf" ]
+      then
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+      else
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+      fi
+
       # Cleanup underlying /run
+      sync
       mount -o bind / /mnt
       rm -rf /mnt/run/*
       umount /mnt
@@ -277,7 +298,6 @@ actions:
       echo "lxc.variant={{ image.variants }}" >> /etc/lxc-config
       echo "lxc.serial={{ image.serial }}" >> /etc/lxc-config
       echo "container.name={{ container.name }}" >> /etc/lxc-config
-      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config1
 
 mappings:
   architecture_map: debian
