@@ -263,7 +263,7 @@ actions:
       /usr/local/bin/pip install pytest-html
       
       # Enable SNMP MIBS
-      sed -i 's/#\smibs.*/mibs +ALL/g' /etc/snmp/snmp.conf
+      sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
 
       # Download extra SNMP MIBS
       download-mibs
