@@ -190,6 +190,8 @@ packages:
       - snmp
       - snmp-mibs-downloader
       - snmpd
+      - python3-pip
+      - python3-zmq
       action: install
 
     - packages:
@@ -244,23 +246,23 @@ actions:
       rm -f /lib/systemd/system/openvswitch-switch.service
 
       # Upgrade PIP to current
-      /usr/bin/pip install --upgrade pip
+      /usr/bin/pip2 install --upgrade pip
 
       # Install zipp 1.2.0 (newer fails on ARM)
-      /usr/local/bin/pip install 'zipp==1.2.0'
+      /usr/local/bin/pip2 install 'zipp==1.2.0'
 
       # Install pytest before v5 for mininet
-      /usr/local/bin/pip install 'pytest'
+      /usr/local/bin/pip2 install 'pytest'
 
       # Install ExaBGP 3.4.17 with PIP
-      /usr/local/bin/pip install 'exabgp==3.4.17'
+      /usr/local/bin/pip2 install 'exabgp==3.4.17'
       useradd -d /var/run/exabgp/ -s /bin/false exabgp
 
       # Install scapy for topotests
-      /usr/local/bin/pip install 'scapy'
+      /usr/local/bin/pip2 install 'scapy'
 
       # Install pytest-html
-      /usr/local/bin/pip install pytest-html
+      /usr/local/bin/pip2 install pytest-html
       
       # Enable SNMP MIBS
       sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
@@ -279,6 +281,9 @@ actions:
           wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/mibs/ietf/SNMPv2-PDU
           wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
       fi
+
+      # Install Python3 junitparser
+      /usr/bin/pip3 install junitparser
 
       # Cleanup underlying /run
       sync
