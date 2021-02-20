@@ -192,6 +192,7 @@ packages:
       - snmpd
       - python3-pip
       - python3-zmq
+      - vlan
       action: install
 
     - packages:
