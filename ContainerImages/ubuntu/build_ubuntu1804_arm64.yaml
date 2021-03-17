@@ -201,7 +201,8 @@ packages:
       - libmnl-dev
       - libncurses5-dev
       - libpam-dev
-      - libpcre3-dev 
+      - libpcre3-dev
+      - libpcre2-dev 
       - libprotobuf-c-dev
       - libreadline-dev
       - libsensors4-dev
