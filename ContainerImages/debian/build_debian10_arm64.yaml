@@ -18,6 +18,9 @@ source:
   keys:
     # Keys from https://ftp-master.debian.org/keys.html
     #
+    # Debian 11 bullseye
+    #- 0xA4285295FC7B1A81600062A9605C66F00D6C9793
+    #
     # Debian 10 buster
     - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
     #
@@ -167,7 +170,8 @@ packages:
       - libmnl-dev
       - libncurses5-dev
       - libpam-dev
-      - libpcre3-dev 
+      - libpcre3-dev
+      - libpcre2-dev
       - libprotobuf-c-dev
       - libreadline-dev
       - libsensors4-dev
@@ -190,6 +194,7 @@ packages:
       - python3-sphinx
       - sudo
       - texinfo
+      #- texlive-latex-base
       - vim
       - zlib1g-dev
       action: install
@@ -234,6 +239,9 @@ actions:
       #!/bin/sh
       set -eux
 
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
@@ -241,11 +249,6 @@ actions:
     action: |-
       #!/bin/sh
       set -eux
-
-      # Create the sudo group
-      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
-      # Allow sudo group access without password
-      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
       # Disable networkd (unused)
       systemctl mask systemd-networkd.service
@@ -257,6 +260,22 @@ actions:
       locale-gen en_US.UTF-8 UTF-8
       update-locale LANG=en_US.UTF-8
 
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
       # Cleanup underlying /run
       mount -o bind / /mnt
       rm -rf /mnt/run/*
@@ -265,7 +284,12 @@ actions:
       # Cleanup temporary shadow paths
       rm /etc/*-
 
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
+
 mappings:
-  architectures:
-    amd64: x86_64
   architecture_map: debian
