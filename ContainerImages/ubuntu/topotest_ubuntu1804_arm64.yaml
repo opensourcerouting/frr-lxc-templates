@@ -173,23 +173,32 @@ packages:
   sets:
     - packages:
       - apt-transport-https
+      - cgroup-tools
       - curl
       - dnsutils
       - gdb
+      - git
+      - iperf
       - iproute2
       - libssh-4
       - iputils-ping
       - libc-ares2
+      - libcgroup1
       - libsnmp30
       - lsof
-      - mininet
       - openssh-server
+      - openvswitch-switch
       - python-ipaddr
       - python-pip
+      - python3-pip
+      - python3-pkg-resources
       - patch
+      - net-tools
       - snmp
       - snmp-mibs-downloader
       - snmpd
+      - socat
+      - telnet
       - python3-pip
       - python3-zmq
       - vlan
@@ -198,7 +207,6 @@ packages:
     - packages:
       - gcc
       - geoip-database
-      - perl
       - tcl-expect
       - tcl8.6
       - tex-common
@@ -239,32 +247,89 @@ actions:
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
 
-      # Disable OpenVSwitch startup - we provide our
-      # own as part of the topotests
-      systemctl disable openvswitch-switch
-      rm -f /lib/systemd/system/ovsdb-server.service
-      rm -f /lib/systemd/system/ovs-vswitchd.service
-      rm -f /lib/systemd/system/openvswitch-switch.service
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      # Add latest mininet 2.3.0 package
+      wget -O temp.deb https://ftp.debian.org/debian/pool/main/m/mininet/mininet_2.3.0-1_${lxc_arch}.deb
+      dpkg -i temp.deb
+      rm -f temp.deb
+
+      # Enable OpenVSwitch startup
+      systemctl enable openvswitch-switch
 
       # Upgrade PIP to current
       /usr/bin/pip2 install --upgrade pip
 
+      # Upgrade PIP3 setuptools to current
+      /usr/bin/pip3 install --upgrade setuptools
+
+      # Fix mininet path for python2
+      /usr/local/bin/pip2 install -U 'mininet==2.3.0.dev6'
+
       # Install zipp 1.2.0 (newer fails on ARM)
       /usr/local/bin/pip2 install 'zipp==1.2.0'
 
-      # Install pytest before v5 for mininet
-      /usr/local/bin/pip2 install 'pytest'
+      # Install pytest 4.6.11 with PIP2 for mininet
+      /usr/local/bin/pip2 install 'pytest==4.6.11'
 
-      # Install ExaBGP 3.4.17 with PIP
+      # Rename py.test 4.6.11 files
+      mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python2-4.6.11
+      mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python2-4.6.11
+
+      # Install pytest 6.2.2 with PIP3 for mininet
+      /usr/bin/pip3 install 'pytest==6.2.2'
+
+      # Rename py.test 6.2.2 files
+      mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python3-6.2.2
+      mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python3-6.2.2
+
+      # Create symlinks for pytests
+      ln -s /usr/local/bin/py.test-python2-4.6.11 /usr/local/bin/py.test
+      ln -s /usr/local/bin/pytest-python2-4.6.11 /usr/local/bin/pytest
+      ln -s /usr/local/bin/py.test-python3-6.2.2 /usr/local/bin/py.test-3
+      ln -s /usr/local/bin/pytest-python3-6.2.2 /usr/local/bin/pytest-3
+
+      # Install ExaBGP 3.4.17 with PIP2
       /usr/local/bin/pip2 install 'exabgp==3.4.17'
+      mv -f /usr/local/bin/exabgp /usr/local/bin/exabgp-3.4.17
+      mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-3.4.17
       useradd -d /var/run/exabgp/ -s /bin/false exabgp
 
-      # Install scapy for topotests
+      # Install OSR Fork of ExaBGP 4.2.11 wth PIP3
+      /usr/bin/pip3 install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
+      mv -f /usr/local/bin/exabgp /usr/local/bin/exabgp-4.2.11-frr
+      mv -f /usr/local/bin/exabgp-cli /usr/local/bin/exabgp-cli-4.2.11-frr
+      mv -f /usr/local/bin/exabgp-healthcheck /usr/local/bin/exabgp-healthcheck-4.2.11-frr
+      mv -f /usr/local/bin/exabgpcli /usr/local/bin/exabgpcli-4.2.11-frr
+      mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-4.2.11-frr
+
+      # Create default symlink for ExaBGP 3.4.17
+      ln -s /usr/local/bin/exabgp-3.4.17 /usr/local/bin/exabgp
+      ln -s /usr/local/etc/exabgp-3.4.17 /usr/local/etc/exabgp
+
+      # Install scapy pip2 for topotests
       /usr/local/bin/pip2 install 'scapy'
 
-      # Install pytest-html
+      # Install scapy pip3 for topotests
+      /usr/bin/pip3 install 'scapy' 'ipaddr' 'ipaddress' 'junitparser'
+
+      # Install pytest-html pip2
       /usr/local/bin/pip2 install pytest-html
-      
+
+      # Install pytest-html pip3
+      /usr/bin/pip3 install pytest-html
+
       # Enable SNMP MIBS
       sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
 
@@ -297,13 +362,10 @@ actions:
 
       # Add builddate to /etc/lxc-config
       echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
-      echo "lxc.imagename={{ image.name }}" >> /etc/lxc-config
-      echo "lxc.release={{ image.release }}" >> /etc/lxc-config
-      echo "lxc.arch={{ image.architecture }}" >> /etc/lxc-config
-      echo "lxc.distro={{ image.distribution }}" >> /etc/lxc-config
-      echo "lxc.variant={{ image.variants }}" >> /etc/lxc-config
-      echo "lxc.serial={{ image.serial }}" >> /etc/lxc-config
-      echo "container.name={{ container.name }}" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
 
 mappings:
   architecture_map: debian

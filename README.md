@@ -70,13 +70,16 @@ Disable apport on LXC host to avoid Ubuntu moving dumps:
 
 	echo "enabled=0" >> /etc/apport
 
-Modify `/etc/security/limits.conf` to enable core dumps. Add the following lines:
+Modify `/etc/security/limits.conf` to enable core dumps (item core) and 
+enough virtual terminal connections (item soft). Add the following lines:
 
 	#<domain>      <type>  <item>         <value>
 	*               soft    core          unlimited
 	root            soft    core          unlimited
 	*               hard    core          unlimited
 	root            hard    core          unlimited
+        *               soft    nofile        unlimited
+        root            soft    nofile        unlimited
 
 Reboot LXC Host to activate the changes
 
