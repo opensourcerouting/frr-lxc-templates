@@ -190,6 +190,7 @@ packages:
       - protobuf-c-compiler
       - psmisc
       - python3-dev
+      - python3-pip
       - python3-pytest
       - python3-sphinx
       - sudo
@@ -262,6 +263,9 @@ actions:
 
       # Allow sudo group access without password
       sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Add apkg pip3 package
+      /usr/bin/pip3 install apkg
 
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`

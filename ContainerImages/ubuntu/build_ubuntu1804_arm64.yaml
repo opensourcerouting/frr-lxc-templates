@@ -146,6 +146,7 @@ packages:
       url: |-
         deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
         deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
         deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
       architectures:
         - amd64
@@ -155,6 +156,7 @@ packages:
       url: |-
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
@@ -220,9 +222,8 @@ packages:
       - protobuf-c-compiler
       - psmisc
       - python3-dev
-      - python3-dev
+      - python3-pip
       - python3-pytest
-      - python3-sphinx
       - python3-sphinx
       - sudo
       - texinfo
@@ -306,6 +307,29 @@ actions:
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
 
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      if [ "${UBUNTU_CODENAME}" = "xenial" ]; then
+         # Need newer debhelper from backports
+         apt install -y -t xenial-backports debhelper
+         # Jinja3 (needed by apkg) needs to be below 3.0 to work with Python 3.5
+         /usr/bin/pip3 install -U "Jinja2<3"
+      fi
+
+      # Add apkg pip3 package
+      /usr/bin/pip3 install apkg
+
       # Cleanup underlying /run
       mount -o bind / /mnt
       rm -rf /mnt/run/*
@@ -313,6 +337,13 @@ actions:
 
       # Cleanup temporary shadow paths
       rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
 
 mappings:
   architecture_map: debian
