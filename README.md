@@ -105,29 +105,35 @@ or to build i386 Ubuntu 16.04:
 Other tested containers:
 
 - Build on Intel (on x86_64 Ubuntu 20.04 host)
-	- Ubuntu 16.04, i386:  `distrobuilder build-lxc build-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=i386`
-	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc build-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
-	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc build-ubuntu-18.04-amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
-	- Ubuntu 20.04, x86_64:  `distrobuilder build-lxc build-ubuntu-18.04-amd64.yaml -o image.release=focal -o image.architecture=x86_64`
+	- Ubuntu 16.04, i386:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=i386`
+	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
+	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
+	- Ubuntu 20.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=focal -o image.architecture=x86_64`
 
 - Build on ARM (on Raspberry Pi4, Ubuntu 20.04 host)
-	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=xenial -o image.architecture=armhf`
-	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
-	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=bionic -o image.architecture=armhf`
-	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
-	- Ubuntu 20.04, armhf:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=focal -o image.architecture=armhf`
-	- Ubuntu 20.04, aarch64:  `distrobuilder build-lxc build-ubuntu-18.04-arm64.yaml -o image.release=focal -o image.architecture=aarch64`
+	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=armhf`
+	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
+	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=armhf`
+	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
+	- Ubuntu 20.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=armhf`
+	- Ubuntu 20.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=aarch64`
+
+	- Debian 9, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=armhf`
+	- Debian 9, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=aarch64`
+
+	- Debian 10, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=buster -o image.architecture=armhf`
+	- Debian 10, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=buster -o image.architecture=aarch64`
 
 - TopoTest on Intel (on x86_64 Ubuntu 20.04 host)
-	- Ubuntu 16.04, i386:  `distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=i386`
-	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
-	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
+	- Ubuntu 16.04, i386:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=i386`
+	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
+	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
 
 - TopoTest on ARM (on Raspberry Pi4, Ubuntu 20.04 host)
-	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc topotest-ubuntu-18.04-arm64.yaml -o image.release=xenial -o image.architecture=armhf`
-	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc topotest-ubuntu-18.04-arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
-	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc topotest-ubuntu-18.04-arm64.yaml -o image.release=bionic -o image.architecture=armhf`
-	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc topotest-ubuntu-18.04-arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
+	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=armhf`
+	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
+	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=armhf`
+	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
 
 3. Add build LXC image to the local containers
 
