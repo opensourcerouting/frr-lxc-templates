@@ -167,6 +167,7 @@ packages:
       - gawk
       - git
       - git-buildpackage
+      - gpg
       - groff
       - install-info
       - iproute2
