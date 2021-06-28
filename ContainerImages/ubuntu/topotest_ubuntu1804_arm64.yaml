@@ -184,6 +184,7 @@ packages:
       - iputils-ping
       - libc-ares2
       - libcgroup1
+      - libpcre2-8-0
       - libsnmp30
       - lsof
       - openssh-server
