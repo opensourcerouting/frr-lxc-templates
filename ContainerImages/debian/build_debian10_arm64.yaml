@@ -19,7 +19,7 @@ source:
     # Keys from https://ftp-master.debian.org/keys.html
     #
     # Debian 11 bullseye
-    #- 0xA4285295FC7B1A81600062A9605C66F00D6C9793
+    - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
     #
     # Debian 10 buster
     - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
@@ -160,7 +160,6 @@ packages:
       - dejagnu
       - devscripts
       - dh-autoreconf
-      - dh-systemd
       - doxygen
       - equivs
       - fakeroot
@@ -211,6 +210,14 @@ packages:
       - vim
       - zlib1g-dev
       action: install
+
+    - packages:
+      - dh-systemd
+      action: install
+      releases:
+        - jessie
+        - stretch
+        - buster
 
     - packages:
       - libprotoc17
