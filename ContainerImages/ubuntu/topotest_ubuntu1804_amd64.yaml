@@ -322,8 +322,8 @@ actions:
       # Install scapy pip2 for topotests
       /usr/local/bin/pip2 install 'scapy'
 
-      # Install scapy pip3 for topotests
-      /usr/bin/pip3 install 'scapy' 'ipaddr' 'ipaddress' 'junitparser'
+      # Install pip3 modules for topotests
+      /usr/bin/pip3 install 'scapy' 'ipaddr' 'ipaddress' 'junitparser' 'pytest-xdist' 'xmltodict'
 
       # Install pytest-html pip2
       /usr/local/bin/pip2 install pytest-html
