@@ -78,8 +78,8 @@ enough virtual terminal connections (item soft). Add the following lines:
 	root            soft    core          unlimited
 	*               hard    core          unlimited
 	root            hard    core          unlimited
-        *               soft    nofile        unlimited
-        root            soft    nofile        unlimited
+	*               soft    nofile        unlimited
+	root            soft    nofile        unlimited
 
 Reboot LXC Host to activate the changes
 
@@ -124,8 +124,8 @@ Other tested containers:
 	- Debian 10, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=buster -o image.architecture=armhf`
 	- Debian 10, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=buster -o image.architecture=aarch64`
 
-        - Debian 11, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=armhf`
-        - Debian 11, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=aarch64`
+	- Debian 11, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=armhf`
+	- Debian 11, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=aarch64`
 
 - TopoTest on Intel (on x86_64 Ubuntu 20.04 host)
 	- Ubuntu 16.04, i386:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=i386`
