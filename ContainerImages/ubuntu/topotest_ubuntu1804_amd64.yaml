@@ -178,6 +178,7 @@ packages:
       - dnsutils
       - gdb
       - git
+      - graphviz
       - iperf
       - iproute2
       - libssh-4
@@ -190,6 +191,8 @@ packages:
       - openssh-server
       - openvswitch-switch
       - python-ipaddr
+      - python3-jinja2
+      - python3-lxml
       - python-pip
       - python3-pip
       - python3-pkg-resources
@@ -200,6 +203,7 @@ packages:
       - snmpd
       - socat
       - telnet
+      - tshark
       - python3-pip
       - python3-zmq
       - vlan
@@ -239,6 +243,12 @@ actions:
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
+      # Create the FRR user account and groups
+      groupadd --system frrvty
+      groupadd --system frr
+      useradd --system --gid --home-dir /nonexistent --comment "Frr routing suite" frr
+      usermod -a -G frrvty frr
+
   - trigger: post-packages
     action: |-
       #!/bin/sh
@@ -263,6 +273,11 @@ actions:
 
       # Add latest mininet 2.3.0 package
       wget -O temp.deb https://ftp.debian.org/debian/pool/main/m/mininet/mininet_2.3.0-1_${lxc_arch}.deb
+      dpkg -i temp.deb
+      rm -f temp.deb
+
+      # Add tiny package (from Ubuntu 20.04)
+      wget -O temp.deb http://archive.ubuntu.com/ubuntu/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
       dpkg -i temp.deb
       rm -f temp.deb
 
