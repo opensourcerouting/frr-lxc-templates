@@ -1,0 +1,337 @@
+# Tested on
+#   Ubuntu 20.04 aarch64/armhf  (focal)
+#
+# Use Distrobuilder (see README.md) to create the LXC images
+# Default output is Ubuntu 20.04 on aarch64 architucture
+#
+
+image:
+  name: ubuntu-topotest
+  distribution: ubuntu
+  release: focal
+  description: |-
+    Ubuntu {{ image.release }}
+  architecture: aarch64
+
+source:
+  downloader: debootstrap
+  same_as: gutsy
+  url: http://ports.ubuntu.com/ubuntu-ports
+  keyserver: keyserver.ubuntu.com
+  keys:
+    - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+
+targets:
+  lxc:
+    create-message: |-
+      You just created an {{ image.description }} container.
+
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/kernel/debug sys/kernel/debug none bind,optional 0 0
+          lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 0
+          lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
+          lxc.mount.entry = mqueue dev/mqueue mqueue rw,relatime,create=dir,optional 0 0
+
+          # Disable apparmor to be able to run mininet
+          lxc.mount.auto = cgroup:mixed proc:rw sys:mixed
+          lxc.apparmor.profile = unconfined
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/firmware/efi/efivars sys/firmware/efi/efivars none bind,optional 0 0
+          lxc.mount.entry = /proc/sys/fs/binfmt_misc proc/sys/fs/binfmt_misc none bind,optional 0 0
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_personality }}
+
+files:
+
+  - path: /etc/hostname
+    generator: hostname
+
+  - path: /etc/hosts
+    generator: hosts
+
+  - path: /etc/resolvconf/resolv.conf.d/original
+    generator: remove
+
+  - path: /etc/resolvconf/resolv.conf.d/tail
+    generator: remove
+
+  - path: /etc/machine-id
+    generator: remove
+
+  - path: /etc/netplan/10-lxc.yaml
+    generator: dump
+    content: |-
+      network:
+        version: 2
+        ethernets:
+          eth0: {dhcp4: true}
+    releases:
+    - artful
+    - bionic
+    - cosmic
+    - disco
+    - focal
+
+  - path: /etc/network/interfaces
+    generator: dump
+    content: |-
+      # This file describes the network interfaces available on your system
+      # and how to activate them. For more information, see interfaces(5).
+
+      # The loopback network interface
+      auto lo
+      iface lo inet loopback
+
+      auto eth0
+      iface eth0 inet dhcp
+    releases:
+    - trusty
+    - xenial
+
+  - path: /etc/init/lxc-tty.conf
+    generator: upstart-tty
+    releases:
+    - trusty
+
+  - name: meta-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: network-config
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: user-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: vendor-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+packages:
+  manager: apt
+  update: true
+  cleanup: true
+
+  repositories:
+    - name: sources.list
+      url: |-
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
+      architectures:
+        - amd64
+        - i386
+
+    - name: sources.list
+      url: |-
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
+      architectures:
+        - armhf
+        - arm64
+        - powerpc
+        - powerpc64
+        - ppc64el
+
+  sets:
+    - packages:
+      - apt-transport-https
+      - cgroup-tools
+      - curl
+      - dnsutils
+      - gdb
+      - git
+      - graphviz
+      - iperf
+      - iproute2
+      - iputils-ping
+      - libc-ares2
+      - libcgroup1
+      - libpcre2-8-0
+      - librtr0
+      - libsnmp35
+      - libssh-4
+      - lsof
+      - net-tools
+      - openssh-server
+      - patch
+      - python-is-python2
+      - python-setuptools
+      - python2
+      - python3-ipaddr
+      - python3-lxml
+      - python3-pip
+      - python3-pkg-resources
+      - python3-pytest
+      - python3-pytest-xdist
+      - python3-scapy
+      - python3-setproctitle
+      - python3-typing-extensions
+      - python3-xmltodict
+      - python3-zmq
+      - screen
+      - snmp
+      - snmp-mibs-downloader
+      - snmpd
+      - socat
+      - tcpdump
+      - telnet
+      - tini
+      - tshark
+      - vim
+      - vlan
+      action: install
+
+    - packages:
+      - gcc
+      - geoip-database
+      - tcl-expect
+      - tcl8.6
+      - tex-common
+      - texinfo
+      - x11-common
+      - xauth
+      - xdg-utils
+      - python-pytest
+      action: remove
+
+    - packages:
+      - gcc-7
+      - gcc-8
+      action: remove
+      releases:
+        - bionic
+
+actions:
+  - trigger: post-update
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # prevent service autostart after install
+      echo "#!/bin/sh" >> /usr/sbin/policy-rc.d
+      echo "exit 101"  >> /usr/sbin/policy-rc.d
+      chmod +x /usr/sbin/policy-rc.d
+
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
+
+      # exabgp user
+      useradd -d /var/run/exabgp --no-create-home -s /sbin/nologin -U exabgp
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Make sure the locale is built and functional
+      locale-gen en_US.UTF-8
+      update-locale LANG=en_US.UTF-8
+
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      # Ignore any attempts to load modules in LXC
+      modprobe="`which modprobe`"
+      ln -b -s "`which true`" "$modprobe"
+
+      # Extra python bits
+      /usr/bin/pip3 install pytest-html junitparser
+
+      # ExaBGP
+      # OSR Fork of ExaBGP 4.2.11
+      /usr/bin/pip3 install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
+
+      # Old ExaBGP 3.4.28
+      cd /tmp
+      git clone -b 3.4.28 https://github.com/Exa-Networks/exabgp.git
+      cd exabgp
+      python2 setup.py install
+      cd /
+      rm -rf /tmp/exabgp
+
+      # Enable SNMP MIBS
+      sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
+
+      # Download extra SNMP MIBS
+      download-mibs
+
+      # Get additional SNMP MIBS
+      if [ -d "/usr/share/snmp/mibs/ietf" ]
+      then
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+      else
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+      fi
+
+      # Cleanup underlying /run
+      sync
+      mount -o bind / /mnt
+      rm -rf /mnt/run/*
+      umount /mnt
+
+      # Cleanup temporary shadow paths
+      rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
+
+mappings:
+  architecture_map: debian
