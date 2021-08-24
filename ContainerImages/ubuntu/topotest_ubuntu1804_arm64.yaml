@@ -244,9 +244,9 @@ actions:
       useradd --create-home -s /bin/bash -G sudo -U ci
 
       # Create the FRR user account and groups
-      groupadd --system frrvty
       groupadd --system frr
-      useradd --system --gid --home-dir /nonexistent --comment "Frr routing suite" frr
+      useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
+      groupadd --system frrvty
       usermod -a -G frrvty frr
 
   - trigger: post-packages
