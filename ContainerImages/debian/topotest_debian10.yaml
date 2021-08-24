@@ -119,7 +119,7 @@ packages:
   repositories:
     - name: sources.list
       url: |-
-        deb http://deb.debian.org/debian {{ image.release }} main
+        deb http://deb.debian.org/debian {{ image.release }} main non-free
         {% if image.release != "sid" and image.release != "bullseye" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
 
     - name: frr-stable.list
@@ -150,6 +150,7 @@ packages:
       - libcgroup1
       - libpcre2-8-0
       - libsnmp30
+      - locales
       - lsof
       - openssh-server
       - openvswitch-switch
@@ -165,6 +166,7 @@ packages:
       - snmp-mibs-downloader
       - snmpd
       - socat
+      - sudo
       - telnet
       - tini
       - tshark
@@ -201,8 +203,6 @@ actions:
 
       # Create the sudo group
       getent group sudo >/dev/null 2>&1 || groupadd --system sudo
-      # Allow sudo group access without password
-      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
@@ -219,8 +219,12 @@ actions:
       set -eux
 
       # Make sure the locale is built and functional
-      locale-gen en_US.UTF-8
+      echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+      locale-gen en_US.UTF-8 UTF-8
       update-locale LANG=en_US.UTF-8
+
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
