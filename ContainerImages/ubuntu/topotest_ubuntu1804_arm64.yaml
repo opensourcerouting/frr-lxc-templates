@@ -277,7 +277,7 @@ actions:
       rm -f temp.deb
 
       # Add tiny package (from Ubuntu 20.04)
-      wget -O temp.deb http://archive.ubuntu.com/ubuntu/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
+      wget -O temp.deb http://ports.ubuntu.com/ubuntu-ports/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
       dpkg -i temp.deb
       rm -f temp.deb
 
