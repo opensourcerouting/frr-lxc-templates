@@ -276,10 +276,9 @@ actions:
       dpkg -i temp.deb
       rm -f temp.deb
 
-      # Add tiny package (from Ubuntu 20.04)
-      wget -O temp.deb http://archive.ubuntu.com/ubuntu/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
-      dpkg -i temp.deb
-      rm -f temp.deb
+      # Add tini static binary
+      wget -q -O /usr/bin/tini https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${lxc_arch}
+      chmod 755 /usr/bin/tini
 
       # Enable OpenVSwitch startup
       systemctl enable openvswitch-switch
