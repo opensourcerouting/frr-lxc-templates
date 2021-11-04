@@ -682,6 +682,10 @@ actions:
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
 
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      sed -i '/^\[Service\]/ a RuntimeDirectoryPreserve=yes' /lib/systemd/system/ssh.service
+
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
       if [ -f /etc/os-release ]; then

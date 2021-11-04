@@ -329,6 +329,10 @@ actions:
       # Install Python3 junitparser
       /usr/bin/pip3 install junitparser
 
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      sed -i '/^\[Service\]/ a RuntimeDirectoryPreserve=yes' /lib/systemd/system/ssh.service
+
       # Cleanup underlying /run
       sync
       mount -o bind / /mnt
