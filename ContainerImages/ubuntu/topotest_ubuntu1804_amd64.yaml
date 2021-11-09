@@ -259,7 +259,9 @@ actions:
 
       # Change SSH systemd to keep /run/sshd directory
       # (otherwise we get frequent connection errors)
-      sed -i '/^\[Service\]/ a RuntimeDirectoryPreserve=yes' /lib/systemd/system/ssh.service
+      mkdir /etc/systemd/system/ssh.service.d
+      echo "[Service]" > /etc/systemd/system/ssh.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh.service.d/override.conf
 
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
