@@ -695,15 +695,19 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
-      if [ "${UBUNTU_CODENAME}" = "xenial" ]; then
+      if [ "${VERSION_CODENAME}" = "xenial" ]; then
          # Need newer debhelper from backports
          apt install -y -t xenial-backports debhelper
-         # Jinja3 (needed by apkg) needs to be below 3.0 to work with Python 3.5
+         # A few libs (needed by apkg) needs to be below some version to work with Python 3.5
          /usr/bin/pip3 install -U "Jinja2<3"
+         /usr/bin/pip3 install -U "click<8"
+         /usr/bin/pip3 install -U "packaging<21"
+         # Add apkg pip3 package
+         /usr/bin/pip3 install "apkg<1.0"
+      else
+         # Add apkg pip3 package
+         /usr/bin/pip3 install apkg
       fi
-
-      # Add apkg pip3 package
-      /usr/bin/pip3 install apkg
 
       # Cleanup underlying /run
       mount -o bind / /mnt
