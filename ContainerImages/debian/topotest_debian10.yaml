@@ -136,6 +136,7 @@ packages:
   sets:
     - packages:
       - apt-transport-https
+      - build-essential
       - cgroup-tools
       - curl
       - dnsutils
@@ -144,12 +145,20 @@ packages:
       - graphviz
       - iperf
       - iproute2
-      - libssh-4
       - iputils-ping
+      - libbz2-dev
       - libc-ares2
       - libcgroup1
+      - libffi-dev
+      - libgdbm-dev
+      - libncurses5-dev
+      - libnss3-dev
       - libpcre2-8-0
+      - libreadline-dev
       - libsnmp30
+      - libsqlite3-dev
+      - libssh-4
+      - libssl-dev
       - locales
       - lsof
       - openssh-server
@@ -173,10 +182,10 @@ packages:
       - python3-pip
       - python3-zmq
       - vlan
+      - zlib1g-dev
       action: install
 
     - packages:
-      - gcc
       - geoip-database
       - tcl-expect
       - tcl8.6
@@ -186,13 +195,6 @@ packages:
       - xdg-utils
       - python-pytest
       action: remove
-
-    - packages:
-      - gcc-7
-      - gcc-8
-      action: remove
-      releases:
-        - bionic
 
 actions:
   - trigger: post-update
@@ -272,11 +274,30 @@ actions:
       mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python3-6.2.2
       mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python3-6.2.2
 
+      # Install Python 3.8.9 from Source
+      curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
+      tar -xf Python-3.8.9.tar.xz
+      cd Python-3.8.9/
+      ./configure --enable-optimizations
+      make -j `nproc`
+      make altinstall
+      cd ..
+      rm -rf Python-3.8.9.tar.xz
+      rm -rf Python-3.8.9
+
+      # Install topotest Python 3.8 dependencies
+      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict
+      pip3.8 install pytest==6.2.2 pytest-xdist
+
+      # Fixup pytest-3 scripts to use Python 3.8.9
+      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
+      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/pytest-python3-6.2.2
+
       # Create symlinks for pytests
-      ln -s /usr/local/bin/py.test-python2-4.6.11 /usr/local/bin/py.test
-      ln -s /usr/local/bin/pytest-python2-4.6.11 /usr/local/bin/pytest
-      ln -s /usr/local/bin/py.test-python3-6.2.2 /usr/local/bin/py.test-3
-      ln -s /usr/local/bin/pytest-python3-6.2.2 /usr/local/bin/pytest-3
+      ln -sf /usr/local/bin/py.test-python2-4.6.11 /usr/local/bin/py.test
+      ln -sf /usr/local/bin/pytest-python2-4.6.11 /usr/local/bin/pytest
+      ln -sf /usr/local/bin/py.test-python3-6.2.2 /usr/local/bin/py.test-3
+      ln -sf /usr/local/bin/pytest-python3-6.2.2 /usr/local/bin/pytest-3
 
       # Install ExaBGP 3.4.17 with PIP2
       /usr/local/bin/pip2 install 'exabgp==3.4.17'
@@ -293,8 +314,8 @@ actions:
       mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-4.2.11-frr
 
       # Create default symlink for ExaBGP 3.4.17
-      ln -s /usr/local/bin/exabgp-3.4.17 /usr/local/bin/exabgp
-      ln -s /usr/local/etc/exabgp-3.4.17 /usr/local/etc/exabgp
+      ln -sf /usr/local/bin/exabgp-3.4.17 /usr/local/bin/exabgp
+      ln -sf /usr/local/etc/exabgp-3.4.17 /usr/local/etc/exabgp
 
       # Install scapy pip2 for topotests
       /usr/local/bin/pip2 install 'scapy'
