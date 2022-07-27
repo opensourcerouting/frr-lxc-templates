@@ -207,6 +207,7 @@ packages:
       - python3-pkg-resources
       - patch
       - net-tools
+      - smcroute
       - snmp
       - snmp-mibs-downloader
       - snmpd
@@ -258,6 +259,12 @@ actions:
       # Make sure the locale is built and functional
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
+
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      mkdir /etc/systemd/system/ssh\@.service.d
+      echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
 
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
@@ -323,8 +330,8 @@ actions:
       rm -rf Python-3.8.9
 
       # Install topotest Python 3.8 dependencies
-      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict
-      pip3.8 install pytest==6.2.2 pytest-xdist
+      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
+      pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
 
       # Fixup pytest-3 scripts to use Python 3.8.9
       sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2

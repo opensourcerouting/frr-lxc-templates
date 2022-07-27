@@ -171,6 +171,7 @@ packages:
       - python3-pkg-resources
       - patch
       - net-tools
+      - smcroute
       - snmp
       - snmp-mibs-downloader
       - snmpd
