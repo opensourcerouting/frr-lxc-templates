@@ -287,8 +287,8 @@ actions:
       rm -rf Python-3.8.9
 
       # Install topotest Python 3.8 dependencies
-      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict
-      pip3.8 install pytest==6.2.2 pytest-xdist
+      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
+      pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
 
       # Fixup pytest-3 scripts to use Python 3.8.9
       sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
