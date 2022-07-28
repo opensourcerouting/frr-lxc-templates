@@ -2,6 +2,7 @@
 #   Ubuntu 16.04 amd64/i386  (xenial)
 #   Ubuntu 18.04 amd64       (bionic)
 #   Ubuntu 20.04 amd64       (focal)
+#   Ubuntu 22.04 amd64       (jammy)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -93,6 +94,7 @@ files:
      - cosmic
      - disco
      - focal
+     - jammy
 
  - path: /etc/network/interfaces
    generator: dump
@@ -272,6 +274,7 @@ packages:
       action: install
       releases:
         - focal
+        - jammy
 
     - packages:
       - snapcraft

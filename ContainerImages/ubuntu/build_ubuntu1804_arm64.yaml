@@ -2,6 +2,7 @@
 #   Ubuntu 16.04 aarch64/armhf  (xenial)
 #   Ubuntu 18.04 aarch64/armhf  (bionic)
 #   Ubuntu 20.04 aarch64        (focal)
+#   Ubuntu 22.04 aarch64        (jammy)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -20,6 +21,7 @@ source:
   keyserver: keyserver.ubuntu.com
   keys:
     - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+    - 0xf6ecb3762474eda9d21b7022871920d1991bc93c
 
 targets:
   lxc:
@@ -93,6 +95,7 @@ files:
      - cosmic
      - disco
      - focal
+     - jammy
 
  - path: /etc/network/interfaces
    generator: dump
@@ -193,7 +196,6 @@ packages:
       - dejagnu
       - devscripts
       - dh-autoreconf
-      - dh-systemd
       - doxygen
       - equivs
       - fakeroot
@@ -245,6 +247,18 @@ packages:
       action: install
 
     - packages:
+      - dh-systemd
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+        - focal
+
+    - packages:
       - libprotoc9v5
       action: install
       releases:
@@ -272,6 +286,7 @@ packages:
       action: install
       releases:
         - focal
+        - jammy
 
     - packages:
       - snapcraft

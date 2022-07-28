@@ -109,6 +109,7 @@ Other tested containers:
 	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
 	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
 	- Ubuntu 20.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=focal -o image.architecture=x86_64`
+	- Ubuntu 22.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=jammy -o image.architecture=x86_64`
 
 - Build on ARM (on Raspberry Pi4, Ubuntu 20.04 host)
 	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=armhf`
@@ -117,6 +118,8 @@ Other tested containers:
 	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
 	- Ubuntu 20.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=armhf`
 	- Ubuntu 20.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=aarch64`
+	- Ubuntu 22.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=jammy -o image.architecture=aarch64`
+	- Ubuntu 22.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=jammy -o image.architecture=armhf`
 
 	- Debian 9, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=armhf`
 	- Debian 9, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=aarch64`
