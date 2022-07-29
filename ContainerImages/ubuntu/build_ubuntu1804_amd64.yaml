@@ -676,14 +676,14 @@ actions:
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
+      # Make sure the locale is built and functional
+      locale-gen en_US.UTF-8
+      update-locale LANG=en_US.UTF-8
+
   - trigger: post-packages
     action: |-
       #!/bin/sh
       set -eux
-
-      # Make sure the locale is built and functional
-      locale-gen en_US.UTF-8
-      update-locale LANG=en_US.UTF-8
 
       # Change SSH systemd to keep /run/sshd directory
       # (otherwise we get frequent connection errors)
