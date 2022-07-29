@@ -207,7 +207,6 @@ packages:
       - install-info
       - iproute2
       - iputils-ping
-      - language-pack-en
       - libc-ares-dev
       - libcap-dev
       - libcmocka-dev
