@@ -196,7 +196,6 @@ packages:
       - dejagnu
       - devscripts
       - dh-autoreconf
-      - dh-systemd
       - doxygen
       - equivs
       - fakeroot
@@ -245,6 +244,18 @@ packages:
       - vim
       - zlib1g-dev
       action: install
+
+    - packages:
+      - dh-systemd
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+        - focal
 
     - packages:
       - libprotoc9v5
