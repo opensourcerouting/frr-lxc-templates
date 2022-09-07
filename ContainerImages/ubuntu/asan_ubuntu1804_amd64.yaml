@@ -3,6 +3,7 @@
 #
 # Use Distrobuilder (see README.md) to create the LXC images
 # Default output is Ubuntu 18.04 on x86_64 architucture
+# Tested are 18.04 (bionic) and 22.04 (jammy)
 #
 
 image:
@@ -20,6 +21,7 @@ source:
   keyserver: keyserver.ubuntu.com
   keys:
     - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+    - 0xf6ecb3762474eda9d21b7022871920d1991bc93c
 
 targets:
   lxc:
@@ -98,6 +100,7 @@ files:
     - cosmic
     - disco
     - focal
+    - jammy
 
   - path: /etc/network/interfaces
     generator: dump
@@ -150,6 +153,7 @@ packages:
       url: |-
         deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
         deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
         deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
       architectures:
         - amd64
@@ -159,6 +163,7 @@ packages:
       url: |-
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
@@ -208,10 +213,8 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
-      - python-ipaddr
       - python3-jinja2
       - python3-lxml
-      - python-pip
       - python3-pip
       - python3-pkg-resources
       - python3-sphinx
@@ -231,6 +234,25 @@ packages:
       - vlan
       - zlib1g-dev
       action: install
+
+    - packages:
+      - python-ipaddr
+      - python-pip
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+        - focal
+
+    - packages:
+      - python2.7
+      action: install
+      releases:
+        - jammy
 
     - packages:
       - geoip-database
@@ -260,6 +282,41 @@ actions:
       useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
       groupadd --system frrvty
       usermod -a -G frrvty frr
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Install old python2
+      curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+      python2.7 get-pip.py
+      ln -s /usr/local/bin/pip2 /usr/bin/pip2
+
+    releases:
+      - jammy
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Update ping
+      apt install -y meson xsltproc gettext
+      git clone https://github.com/iputils/iputils.git
+      cd iputils
+      git checkout 1ab5fafee626
+      mkdir build
+      meson . build
+      cd build
+      ninja
+      ninja install
+      apt purge -y meson xsltproc
+      apt autoremove -y
+
+    releases:
+      - bionic
+      - focal
 
   - trigger: post-packages
     action: |-
@@ -327,24 +384,37 @@ actions:
       mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python3-6.2.2
       mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python3-6.2.2
 
-      # Install Python 3.8.9 from Source
-      curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
-      tar -xf Python-3.8.9.tar.xz
-      cd Python-3.8.9/
-      ./configure --enable-optimizations
-      make -j `nproc`
-      make altinstall
-      cd ..
-      rm -rf Python-3.8.9.tar.xz
-      rm -rf Python-3.8.9
-
-      # Install topotest Python 3.8 dependencies
-      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
-      pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
-
-      # Fixup pytest-3 scripts to use Python 3.8.9
-      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
-      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/pytest-python3-6.2.2
+      # Check for python3 to be a min of 3.8.9 and update from source if not
+      currentver="$(python3 -V | cut -d' ' -f2)"
+      requiredver="3.8.9"
+      if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
+          # Python3 is equal or greater the required version
+          #
+          # Install topotest Python 3 dependencies
+          pip3 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
+          pip3 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
+      else
+          # Python is too old. Upgrade
+          #
+          # Install Python 3.8.9 from Source
+          curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
+          tar -xf Python-3.8.9.tar.xz
+          cd Python-3.8.9/
+          ./configure --enable-optimizations
+          make -j `nproc`
+          make altinstall
+          cd ..
+          rm -rf Python-3.8.9.tar.xz
+          rm -rf Python-3.8.9
+          #
+          # Install topotest Python 3.8 dependencies
+          pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
+          pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
+          #
+          # Fixup pytest-3 scripts to use Python 3.8.9
+          sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
+          sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/pytest-python3-6.2.2
+      fi
 
       # Create symlinks for pytests
       ln -sf /usr/local/bin/py.test-python2-4.6.11 /usr/local/bin/py.test
