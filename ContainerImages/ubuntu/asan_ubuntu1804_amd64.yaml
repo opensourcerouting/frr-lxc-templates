@@ -183,7 +183,6 @@ packages:
       - install-info
       - iperf
       - iproute2
-      - libssh-dev
       - iputils-ping
       - libbz2-dev
       - libc-ares-dev
@@ -193,6 +192,7 @@ packages:
       - libffi-dev
       - libgdbm-dev
       - libjson-c-dev
+      - liblua5.3-dev
       - libncurses5-dev
       - libnss3-dev
       - libpam0g-dev
@@ -200,10 +200,12 @@ packages:
       - libreadline-dev
       - libsnmp-dev
       - libsqlite3-dev
+      - libssh-dev
       - libssl-dev
       - libtool
       - libunwind-dev
       - lsof
+      - lua5.3
       - openssh-server
       - openvswitch-switch
       - python-ipaddr
