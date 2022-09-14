@@ -182,6 +182,7 @@ packages:
       - curl
       - dnsutils
       - flex
+      - gcovr
       - gdb
       - git
       - graphviz
@@ -189,6 +190,7 @@ packages:
       - iperf
       - iproute2
       - iputils-ping
+      - lcov
       - libbz2-dev
       - libc-ares-dev
       - libcap-dev
@@ -217,6 +219,7 @@ packages:
       - python3-lxml
       - python3-pip
       - python3-pkg-resources
+      - python3-setproctitle
       - python3-sphinx
       - patch
       - pkg-config
@@ -225,6 +228,7 @@ packages:
       - snmp
       - snmp-mibs-downloader
       - snmpd
+      - strace
       - socat
       - telnet
       - texinfo
