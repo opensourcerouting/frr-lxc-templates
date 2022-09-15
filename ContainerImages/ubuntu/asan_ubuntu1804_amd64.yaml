@@ -224,6 +224,7 @@ packages:
       - patch
       - pkg-config
       - net-tools
+      - screen
       - smcroute
       - snmp
       - snmp-mibs-downloader
@@ -232,9 +233,11 @@ packages:
       - socat
       - telnet
       - texinfo
+      - tmux
       - tshark
       - python3-pip
       - python3-zmq
+      - vim
       - vlan
       - zlib1g-dev
       action: install
@@ -252,6 +255,7 @@ packages:
         - xenial
 
     - packages:
+      - linux-tools-generic
       - python2.7
       - python3-junitparser
       - python3-pytest
@@ -301,6 +305,7 @@ actions:
       curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
       python2.7 get-pip.py
       ln -s /usr/local/bin/pip2 /usr/bin/pip2
+      ln -s /usr/bin/python2.7 /usr/bin/python2
 
     releases:
       - jammy
