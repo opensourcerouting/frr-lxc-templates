@@ -182,6 +182,7 @@ packages:
       - graphviz
       - iperf
       - iproute2
+      - iputils-ping
       - libssh-4
       - iputils-ping
       - libbz2-dev
@@ -189,6 +190,7 @@ packages:
       - libcgroup1
       - libffi-dev
       - libgdbm-dev
+      - liblua5.3-dev
       - libncurses5-dev
       - libnss3-dev
       - libpcre2-8-0
@@ -197,28 +199,57 @@ packages:
       - libsqlite3-dev
       - libssl-dev
       - lsof
+      - lua5.3
       - openssh-server
       - openvswitch-switch
       - python-ipaddr
       - python3-jinja2
       - python3-lxml
-      - python-pip
       - python3-pip
       - python3-pkg-resources
+      - python3-setproctitle
       - patch
       - net-tools
+      - screen
       - smcroute
       - snmp
       - snmp-mibs-downloader
       - snmpd
+      - strace
       - socat
       - telnet
+      - tmux
       - tshark
       - python3-pip
       - python3-zmq
       - vlan
       - zlib1g-dev
       action: install
+
+    - packages:
+      - python-ipaddr
+      - python-pip
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+
+    - packages:
+      - linux-tools-generic
+      - python2.7
+      - python3-junitparser
+      - python3-pytest
+      - python3-pytest-xdist
+      - python3-scapy
+      - python3-xmltodict
+      action: install
+      releases:
+        - focal
+        - jammy
 
     - packages:
       - geoip-database
@@ -250,6 +281,43 @@ actions:
       useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
       groupadd --system frrvty
       usermod -a -G frrvty frr
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Install old python2
+      curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+      python2.7 get-pip.py
+      ln -s /usr/local/bin/pip2 /usr/bin/pip2
+      ln -s /usr/bin/python2.7 /usr/bin/python2
+
+    releases:
+      - jammy
+      - focal
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Update ping
+      apt install -y meson xsltproc gettext libcap-dev
+      git clone https://github.com/iputils/iputils.git
+      cd iputils
+      git checkout 1ab5fafee626
+      mkdir build
+      meson . build
+      cd build
+      ninja
+      ninja install
+      apt purge -y meson xsltproc libcap-dev
+      apt autoremove -y
+
+    releases:
+      - bionic
+      - focal
 
   - trigger: post-packages
     action: |-
@@ -311,37 +379,66 @@ actions:
       mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python2-4.6.11
       mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python2-4.6.11
 
-      # Install pytest 6.2.2 with PIP3 for mininet
-      /usr/bin/pip3 install 'pytest==6.2.2'
+      # Check for min pytest 6.2.2 with python3
+      if [ `which pytest-3` ] ; then
+          currentver="$( pytest-3 -V 2>&1 | cut -d' ' -f2 )"
+      else
+          currentver="0"
+      fi
+      requiredver="6.2.2"
+      if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
+          # pytest version is ok
+          #
+          ln -s `which pytest-3` /usr/local/bin/py.test-python3-${currentver}
+          ln -s `which pytest-3` /usr/local/bin/pytest-python3-${currentver}
+          ln -s /usr/local/bin/py.test-python3-${currentver} /usr/local/bin/py.test-3
+          ln -s /usr/local/bin/pytest-python3-${currentver} /usr/local/bin/pytest-3
+      else
+          # Install pytest 6.2.2 from pip3
+          #
+          # Install pytest 6.2.2 with PIP3 for topotests
+          /usr/bin/pip3 install 'pytest==6.2.2'
+          #
+          # Rename py.test 6.2.2 files
+          mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python3-6.2.2
+          mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python3-6.2.2
+          ln -sf /usr/local/bin/py.test-python3-6.2.2 /usr/local/bin/py.test-3
+          ln -sf /usr/local/bin/pytest-python3-6.2.2 /usr/local/bin/pytest-3
+      fi
 
-      # Rename py.test 6.2.2 files
-      mv -f /usr/local/bin/py.test /usr/local/bin/py.test-python3-6.2.2
-      mv -f /usr/local/bin/pytest /usr/local/bin/pytest-python3-6.2.2
-
-      # Install Python 3.8.9 from Source
-      curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
-      tar -xf Python-3.8.9.tar.xz
-      cd Python-3.8.9/
-      ./configure --enable-optimizations
-      make -j `nproc`
-      make altinstall
-      cd ..
-      rm -rf Python-3.8.9.tar.xz
-      rm -rf Python-3.8.9
-
-      # Install topotest Python 3.8 dependencies
-      pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
-      pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
-
-      # Fixup pytest-3 scripts to use Python 3.8.9
-      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
-      sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/pytest-python3-6.2.2
-
-      # Create symlinks for pytests
-      ln -sf /usr/local/bin/py.test-python2-4.6.11 /usr/local/bin/py.test
-      ln -sf /usr/local/bin/pytest-python2-4.6.11 /usr/local/bin/pytest
-      ln -sf /usr/local/bin/py.test-python3-6.2.2 /usr/local/bin/py.test-3
-      ln -sf /usr/local/bin/pytest-python3-6.2.2 /usr/local/bin/pytest-3
+      # Check for python3 to be a min of 3.8.9 and update from source if not
+      currentver="$(python3 -V | cut -d' ' -f2)"
+      requiredver="3.8.9"
+      if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
+          # Python3 is equal or greater the required version
+          #
+          # Install topotest Python 3 dependencies
+          pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+      else
+          # Python is too old. Upgrade
+          #
+          # Install Python 3.8.9 from Source
+          curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
+          tar -xf Python-3.8.9.tar.xz
+          cd Python-3.8.9/
+          ./configure --enable-optimizations
+          make -j `nproc`
+          make altinstall
+          cd ..
+          rm -rf Python-3.8.9.tar.xz
+          rm -rf Python-3.8.9
+          #
+          # Install topotest Python 3.8 dependencies
+          pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
+          pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
+          #
+          # Fixup pytest-3 scripts to use Python 3.8.9
+          sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
+          sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/pytest-python3-6.2.2
+          #
+          # Install Python3 junitparser
+          /usr/bin/pip3 install junitparser
+      fi
 
       # Install ExaBGP 3.4.17 with PIP2
       /usr/local/bin/pip2 install 'exabgp==3.4.17'
