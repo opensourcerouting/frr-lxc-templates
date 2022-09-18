@@ -241,7 +241,6 @@ packages:
       - sudo
       - texinfo
       - texlive-latex-base
-      - vim
       - zlib1g-dev
       action: install
 
@@ -268,6 +267,12 @@ packages:
       action: install
       releases:
         - bionic
+
+    - packages:
+      - libprotoc23
+      action: install
+      releases:
+        - jammy
 
     - packages:
       - texlive-generic-recommended
