@@ -220,10 +220,10 @@ packages:
         - buster
 
     - packages:
-      - libprotoc17
+      - libprotoc9
       action: install
       releases:
-        - buster
+        - jessie
 
     - packages:
       - libprotoc10
@@ -232,10 +232,16 @@ packages:
         - stretch
 
     - packages:
-      - libprotoc9
+      - libprotoc17
       action: install
       releases:
-        - jessie
+        - buster
+
+    - packages:
+      - libprotoc23
+      action: install
+      releases:
+        - bullseye
 
     - packages:
       - geoip-database

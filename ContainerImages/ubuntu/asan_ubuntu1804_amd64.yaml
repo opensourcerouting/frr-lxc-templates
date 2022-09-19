@@ -163,7 +163,7 @@ packages:
       url: |-
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
-        deb http://ports.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
@@ -431,7 +431,6 @@ actions:
           # Python3 is equal or greater the required version
           #
           # Install topotest Python 3 dependencies
-          #   pytest, pytest, xdist, xmltodict, scapy and junitparser are already installed as packages
           pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       else
           # Python is too old. Upgrade
@@ -481,7 +480,7 @@ actions:
       /usr/local/bin/pip2 install 'scapy'
 
       # Install pip3 modules for topotests
-      /usr/bin/pip3 install 'scapy' 'ipaddr' 'ipaddress' 'junitparser' 'pytest-xdist' 'xmltodict'
+      /usr/bin/pip3 install 'scapy' 'ipaddr' 'ipaddress' 'pytest-xdist' 'xmltodict'
 
       # Install pytest-html pip2
       /usr/local/bin/pip2 install pytest-html

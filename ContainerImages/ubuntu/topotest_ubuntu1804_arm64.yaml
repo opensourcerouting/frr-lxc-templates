@@ -23,6 +23,7 @@ source:
   keyserver: keyserver.ubuntu.com
   keys:
     - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+    - 0xf6ecb3762474eda9d21b7022871920d1991bc93c
 
 targets:
   lxc:
@@ -101,6 +102,7 @@ files:
     - cosmic
     - disco
     - focal
+    - jammy
 
   - path: /etc/network/interfaces
     generator: dump
@@ -153,6 +155,7 @@ packages:
       url: |-
         deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
         deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
         deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
       architectures:
         - amd64
@@ -162,6 +165,7 @@ packages:
       url: |-
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
@@ -183,8 +187,6 @@ packages:
       - iperf
       - iproute2
       - iputils-ping
-      - libssh-4
-      - iputils-ping
       - libbz2-dev
       - libc-ares2
       - libcgroup1
@@ -197,17 +199,18 @@ packages:
       - libreadline-dev
       - libsnmp30
       - libsqlite3-dev
+      - libssh-4
       - libssl-dev
       - lsof
       - lua5.3
       - openssh-server
       - openvswitch-switch
-      - python-ipaddr
       - python3-jinja2
       - python3-lxml
       - python3-pip
       - python3-pkg-resources
       - python3-setproctitle
+      - python3-zmq
       - patch
       - net-tools
       - screen
@@ -215,13 +218,11 @@ packages:
       - snmp
       - snmp-mibs-downloader
       - snmpd
-      - strace
       - socat
+      - strace
       - telnet
       - tmux
       - tshark
-      - python3-pip
-      - python3-zmq
       - vlan
       - zlib1g-dev
       action: install
@@ -413,6 +414,7 @@ actions:
           # Python3 is equal or greater the required version
           #
           # Install topotest Python 3 dependencies
+          #   pytest, pytest, xdist, xmltodict, scapy and junitparser are already installed as packages
           pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       else
           # Python is too old. Upgrade

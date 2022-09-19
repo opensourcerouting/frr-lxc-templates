@@ -270,6 +270,12 @@ packages:
         - bionic
 
     - packages:
+      - libprotoc23
+      action: install
+      releases:
+        - jammy
+
+    - packages:
       - texlive-generic-recommended
       action: install
       releases:

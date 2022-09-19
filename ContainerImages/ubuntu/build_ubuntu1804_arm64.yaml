@@ -701,6 +701,12 @@ actions:
       #!/bin/sh
       set -eux
 
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      mkdir /etc/systemd/system/ssh\@.service.d
+      echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
+
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
       if [ -f /etc/os-release ]; then
