@@ -353,7 +353,26 @@ actions:
       dpkg -i temp.deb
       rm -f temp.deb
 
-      # Add tiny package (from Ubuntu 20.04)
+      # Remove default socat binary (leave package to not break mininet)
+      if [ -x "$(command -v socat)" ]; then
+         rm -f `command -v socat`
+      fi
+
+      # Add latest socat from Github:opensourcerouting/socat
+      cd /root
+      apt install -y yodl autoconf
+      git clone https://github.com/opensourcerouting/socat.git
+      cd socat
+      echo "\"opensourcerouting/socat@`git rev-parse --short HEAD`\"" > VERSION
+      autoconf
+      ./configure
+      make -j `nproc`
+      make install
+      apt purge -y yodl
+      cd /root
+      rm -rf socat
+
+      # Add tini package (from Ubuntu 20.04)
       wget -O temp.deb http://ports.ubuntu.com/ubuntu-ports/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
       dpkg -i temp.deb
       rm -f temp.deb

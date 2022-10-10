@@ -230,7 +230,6 @@ packages:
       - snmp-mibs-downloader
       - snmpd
       - strace
-      - socat
       - telnet
       - texinfo
       - tmux
@@ -274,6 +273,7 @@ packages:
       - xauth
       - xdg-utils
       - python-pytest
+      - socat
       action: remove
 
 actions:
@@ -361,10 +361,19 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
-      # Add latest mininet 2.3.0 package
-      wget -O temp.deb https://ftp.debian.org/debian/pool/main/m/mininet/mininet_2.3.0-1_${lxc_arch}.deb
-      dpkg -i temp.deb
-      rm -f temp.deb
+      # Add latest socat from Github:opensourcerouting/socat
+      cd /root
+      apt install -y yodl
+      git clone https://github.com/opensourcerouting/socat.git
+      cd socat
+      echo "\"opensourcerouting/socat@`git rev-parse --short HEAD`\"" > VERSION
+      autoconf
+      ./configure
+      make -j `nproc`
+      make install
+      apt purge -y yodl
+      cd /root
+      rm -rf socat
 
       # Add tini static binary
       wget -q -O /usr/bin/tini https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${lxc_arch}
