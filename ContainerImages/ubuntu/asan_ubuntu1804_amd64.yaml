@@ -326,6 +326,7 @@ actions:
       cd build
       ninja
       ninja install
+      ln -s /usr/local/bin/ping /usr/local/bin/ping6
       apt purge -y meson xsltproc
       apt autoremove -y
 
