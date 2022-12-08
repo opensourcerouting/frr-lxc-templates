@@ -227,6 +227,7 @@ packages:
       - libsystemd-dev
       - libtool
       - lintian
+      - lua5.3
       - lsof
       - make
       - openssh-server

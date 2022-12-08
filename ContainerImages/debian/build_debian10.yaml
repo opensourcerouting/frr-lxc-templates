@@ -194,6 +194,7 @@ packages:
       - lintian
       - locales
       - lsof
+      - lua5.3
       - make
       - openssh-server
       - pkg-config
