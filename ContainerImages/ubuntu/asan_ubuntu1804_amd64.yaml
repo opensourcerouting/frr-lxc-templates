@@ -199,6 +199,7 @@ packages:
       - libffi-dev
       - libgdbm-dev
       - libjson-c-dev
+      - liblttng-ust-dev
       - liblua5.3-dev
       - libncurses5-dev
       - libnss3-dev
