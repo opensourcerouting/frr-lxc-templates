@@ -385,7 +385,7 @@ actions:
       /usr/bin/pip2 install --upgrade pip
 
       # Upgrade PIP3 setuptools to current
-      /usr/bin/pip3 install --upgrade setuptools
+      /usr/bin/pip3 install --upgrade "setuptools<66"
 
       # Fix mininet path for python2
       /usr/local/bin/pip2 install -U 'mininet==2.3.0.dev6'
