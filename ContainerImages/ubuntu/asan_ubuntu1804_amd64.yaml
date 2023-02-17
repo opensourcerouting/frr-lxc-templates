@@ -216,6 +216,7 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - python3-gevent
       - python3-jinja2
       - python3-lxml
       - python3-pip
@@ -458,7 +459,7 @@ actions:
           rm -rf Python-3.8.9
           #
           # Install topotest Python 3.8 dependencies
-          pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing jinja2 docutils
+          pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing jinja2 docutils gevent
           pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
           #
           # Fixup pytest-3 scripts to use Python 3.8.9
