@@ -349,6 +349,11 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
+      if [ "${VERSION_CODENAME}" = "bionic" ]; then
+         # Need newer iproute2 from backports for json output
+         apt install -y -t bionic-backports iproute2
+      fi
+
       # Add latest mininet 2.3.0 package
       wget -O temp.deb https://ftp.debian.org/debian/pool/main/m/mininet/mininet_2.3.0-1_${lxc_arch}.deb
       dpkg -i temp.deb

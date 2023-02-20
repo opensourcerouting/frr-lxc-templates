@@ -364,6 +364,11 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
+      if [ "${VERSION_CODENAME}" = "bionic" ]; then
+         # Need newer iproute2 from backports for json output
+         apt install -y -t bionic-backports iproute2
+      fi
+
       # Add latest socat from Github:opensourcerouting/socat
       cd /root
       apt install -y yodl

@@ -150,6 +150,7 @@ packages:
       url: |-
         deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
         deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
         deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
       architectures:
         - amd64
@@ -159,6 +160,7 @@ packages:
       url: |-
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
         deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
@@ -283,6 +285,11 @@ actions:
       # Ignore any attempts to load modules in LXC
       modprobe="`which modprobe`"
       ln -b -s "`which true`" "$modprobe"
+
+      if [ "${VERSION_CODENAME}" = "bionic" ]; then
+         # Need newer iproute2 from backports for json output
+         apt install -y -t bionic-backports iproute2
+      fi
 
       # Extra python bits
       /usr/bin/pip3 install pytest-html junitparser
