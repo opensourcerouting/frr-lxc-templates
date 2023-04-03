@@ -205,6 +205,8 @@ packages:
       - libnss3-dev
       - libpam0g-dev
       - libpcre2-dev
+      - libpcre3-dev
+      - libprotobuf-c-dev
       - libreadline-dev
       - libsnmp-dev
       - libsqlite3-dev
@@ -225,6 +227,7 @@ packages:
       - python3-sphinx
       - patch
       - pkg-config
+      - protobuf-c-compiler
       - net-tools
       - screen
       - smcroute
