@@ -18,6 +18,9 @@ source:
   keys:
     # Keys from https://ftp-master.debian.org/keys.html
     #
+    # Debian 12 bookworm
+    - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
+    #
     # Debian 11 bullseye
     - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
     #
@@ -131,7 +134,7 @@ packages:
   - name: sources.list
     url: |-
       deb http://deb.debian.org/debian {{ image.release }} main
-      {% if image.release != "sid" and image.release != "bullseye" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+      {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
 
   - name: frr-stable.list
     url: |-
@@ -244,6 +247,12 @@ packages:
       action: install
       releases:
         - bullseye
+
+    - packages:
+      - libprotoc32
+      action: install
+      releases:
+        - bookworm
 
     - packages:
       - geoip-database
@@ -653,6 +662,11 @@ actions:
 
       # Allow sudo group access without password
       sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Enable PIP3 on newer OS
+      install -d /root/.config/pip
+      echo "[global]" > /root/.config/pip/pip.conf
+      echo "break-system-packages = true" >> /root/.config/pip/pip.conf
 
       # Add apkg pip3 package
       /usr/bin/pip3 install apkg
