@@ -195,6 +195,7 @@ packages:
       - python-setuptools
       - python2
       - python3-ipaddr
+      - python3-grpc-tools
       - python3-lxml
       - python3-pip
       - python3-pkg-resources

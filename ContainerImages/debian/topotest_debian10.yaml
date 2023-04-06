@@ -192,6 +192,13 @@ packages:
       action: install
 
     - packages:
+      - python3-grpc-tools
+      action: install
+      releases:
+        - bullseye
+        - bookworm
+
+    - packages:
       - geoip-database
       - tcl-expect
       - tcl8.6
@@ -328,6 +335,7 @@ actions:
           # Install topotest Python 3 dependencies
           #   pytest, pytest, xdist, xmltodict, scapy and junitparser are already installed as packages
           pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+          python3 -c "import grpc_tools" > /dev/null 2> /dev/null || pip3 install grpcio-tools
       else
           # Python is too old. Upgrade
           #
@@ -345,6 +353,7 @@ actions:
           # Install topotest Python 3.8 dependencies
           pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
           pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
+          python3.8 -c "import grpc_tools" > /dev/null 2> /dev/null || pip3.8 install grpcio-tools
           #
           # Fixup pytest-3 scripts to use Python 3.8.9
           sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
