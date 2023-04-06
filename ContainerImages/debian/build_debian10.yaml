@@ -18,7 +18,7 @@ source:
   keys:
     # Keys from https://ftp-master.debian.org/keys.html
     # Debian 12 bookworm
-    - 0x4D64FEC119C2029067D6E791F8D2585B8783D481
+    - 0xB8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
     #
     # Debian 11 bullseye
     - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
