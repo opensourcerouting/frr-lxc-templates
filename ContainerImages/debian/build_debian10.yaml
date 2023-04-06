@@ -657,7 +657,7 @@ actions:
       sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
       # Add apkg pip3 package
-      /usr/bin/pip3 install apkg
+      /usr/bin/pip3 install --break-system-packages apkg
 
       # Change SSH systemd to keep /run/sshd directory
       # (otherwise we get frequent connection errors)
