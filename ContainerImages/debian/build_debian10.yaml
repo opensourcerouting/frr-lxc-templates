@@ -133,7 +133,7 @@ packages:
   - name: sources.list
     url: |-
       deb http://deb.debian.org/debian {{ image.release }} main
-      {% if image.release != "sid" and image.release != "bullseye" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+      {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
 
   - name: frr-stable.list
     url: |-
