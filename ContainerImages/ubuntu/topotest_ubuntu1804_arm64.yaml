@@ -196,6 +196,7 @@ packages:
       - libncurses5-dev
       - libnss3-dev
       - libpcre2-8-0
+      - libprotobuf-c-dev
       - libreadline-dev
       - libsnmp30
       - libsqlite3-dev
@@ -205,6 +206,7 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - protobuf-c-compiler
       - python3-jinja2
       - python3-lxml
       - python3-pip
