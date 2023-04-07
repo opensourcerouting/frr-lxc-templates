@@ -293,7 +293,7 @@ actions:
       fi
 
       # Extra python bits
-      /usr/bin/pip3 install pytest-html junitparser
+      /usr/bin/pip3 install pytest-html junitparser munet
 
       # ExaBGP
       # OSR Fork of ExaBGP 4.2.11
