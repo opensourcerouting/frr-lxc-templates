@@ -293,7 +293,7 @@ actions:
       fi
 
       # Extra python bits
-      /usr/bin/pip3 install pytest-html junitparser munet
+      /usr/bin/pip3 install pytest-html junitparser munet "pytest-asyncio>=0.20.1"
 
       # ExaBGP
       # OSR Fork of ExaBGP 4.2.11
