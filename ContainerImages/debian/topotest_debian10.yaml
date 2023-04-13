@@ -20,6 +20,9 @@ source:
   keys:
     # Keys from https://ftp-master.debian.org/keys.html
     #
+    # Debian 12 bookworm
+    - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
+    #
     # Debian 11 bullseye
     - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
     #
@@ -160,19 +163,18 @@ packages:
       - libsqlite3-dev
       - libssh-4
       - libssl-dev
+      - libxslt1-dev
+      - libxml2-dev
       - locales
       - lsof
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - psmisc
       - python-ipaddr
       - python-pip
-      - python3-jinja2
-      - python3-lxml
       - python3-pip
       - python3-pkg-resources
-      - python3-setproctitle
-      - python3-zmq
       - patch
       - net-tools
       - screen
@@ -190,13 +192,6 @@ packages:
       - vlan
       - zlib1g-dev
       action: install
-
-    - packages:
-      - python3-grpc-tools
-      action: install
-      releases:
-        - bullseye
-        - bookworm
 
     - packages:
       - geoip-database
@@ -334,9 +329,11 @@ actions:
           #
           # Install topotest Python 3 dependencies
           #   pytest, pytest, xdist, xmltodict, scapy and junitparser are already installed as packages
+          pip3 install scapy xmltodict junitparser jinja2 lxml
+          pip3 install docutils gevent ipaddr ipaddress pingparsing
+          pip3 install setproctitle py "pytest==6.2.2" pytest-xdist zmq
           pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
-          python3 -c "import grpc_tools" > /dev/null 2> /dev/null || pip3 install grpcio-tools
-          pip3 install munet "pytest-asyncio>=0.20.1"
+          pip3 install grpcio-tools munet
       else
           # Python is too old. Upgrade
           #
@@ -352,10 +349,13 @@ actions:
           rm -rf Python-3.8.9
           #
           # Install topotest Python 3.8 dependencies
-          pip3.8 install ipaddr ipaddress junitparser scapy xmltodict pingparsing
-          pip3.8 install pytest==6.2.2 pytest-xdist pytest-html==3.1.1
-          python3.8 -c "import grpc_tools" > /dev/null 2> /dev/null || pip3.8 install grpcio-tools
-          pip3.8 install munet "pytest-asyncio>=0.20.1"
+          pip3.8 install scapy xmltodict junitparser jinja2 lxml
+          pip3.8 install docutils gevent ipaddr ipaddress pingparsing
+          pip3.8 install setproctitle py "pytest==6.2.2" pytest-xdist zmq
+          pip3.8 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+          pip3.8 install grpcio-tools munet
+          # Need zmq module in system default python as well
+          pip3 install zmq
           #
           # Fixup pytest-3 scripts to use Python 3.8.9
           sed -i 's|/usr/bin/python3|/usr/local/bin/python3.8|g' /usr/local/bin/py.test-python3-6.2.2
