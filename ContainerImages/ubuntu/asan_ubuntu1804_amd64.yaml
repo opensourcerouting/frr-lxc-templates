@@ -224,6 +224,7 @@ packages:
       - python3-sphinx
       - python3-venv
       - python3-xmltodict
+      - python3-zmq
       - patch
       - pkg-config
       - protobuf-c-compiler
@@ -460,10 +461,10 @@ actions:
       # Create ExaBGP 3 Environment
       . /root/pytest_exabgp3/bin/activate
       pip3 install --upgrade "setuptools<66"
-      pip3 install 'pytest==6.2.2'
+      pip3 install --upgrade "pytest<7"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
-      pip3 install setproctitle py "pytest==6.2.2" pytest-xdist zmq
+      pip3 install setproctitle py pytest-xdist zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       pip3 install grpcio-tools munet
       deactivate
@@ -471,10 +472,10 @@ actions:
       # Create ExaBGP 4 Environment
       . /root/pytest_exabgp4/bin/activate
       pip3 install --upgrade "setuptools<66"
-      pip3 install 'pytest==6.2.2'
+      pip3 install --upgrade "pytest<7"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
-      pip3 install setproctitle py "pytest==6.2.2" pytest-xdist zmq
+      pip3 install setproctitle py pytest-xdist zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       pip3 install grpcio-tools munet
       # Install ExaBGP 4
