@@ -466,7 +466,7 @@ actions:
       pip3 install docutils gevent ipaddr ipaddress pingparsing
       pip3 install setproctitle py pytest-xdist zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
-      pip3 install grpcio-tools munet
+      pip3 install grpcio-tools munet typing-extensions
       deactivate
 
       # Create ExaBGP 4 Environment
@@ -477,7 +477,7 @@ actions:
       pip3 install docutils gevent ipaddr ipaddress pingparsing
       pip3 install setproctitle py pytest-xdist zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
-      pip3 install grpcio-tools munet
+      pip3 install grpcio-tools munet typing-extensions
       # Install ExaBGP 4
       pip3 install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
       deactivate
