@@ -462,6 +462,7 @@ actions:
       . /root/pytest_exabgp3/bin/activate
       pip3 install --upgrade "setuptools<66"
       pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
       pip3 install setproctitle py pytest-xdist zmq
@@ -473,6 +474,7 @@ actions:
       . /root/pytest_exabgp4/bin/activate
       pip3 install --upgrade "setuptools<66"
       pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
       pip3 install setproctitle py pytest-xdist zmq
