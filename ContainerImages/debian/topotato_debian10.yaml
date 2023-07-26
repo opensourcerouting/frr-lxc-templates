@@ -179,9 +179,11 @@ packages:
       - openvswitch-switch
       - protobuf-c-compiler
       - python-pip
+      - python3-jwt
       - python3-lxml
       - python3-pip
       - python3-pkg-resources
+      - python3-requests
       - python3-sphinx
       - python3-venv
       - python3-xmltodict

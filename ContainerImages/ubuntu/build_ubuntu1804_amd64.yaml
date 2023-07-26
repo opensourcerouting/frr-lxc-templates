@@ -237,8 +237,10 @@ packages:
       - protobuf-c-compiler
       - psmisc
       - python3-dev
+      - python3-jwt
       - python3-pip
       - python3-pytest
+      - python3-requests
       - python3-sphinx
       - sudo
       - texinfo

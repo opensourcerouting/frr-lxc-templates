@@ -196,11 +196,13 @@ packages:
       - python2
       - python3-ipaddr
       - python3-grpc-tools
+      - python3-jwt
       - python3-lxml
       - python3-pip
       - python3-pkg-resources
       - python3-pytest
       - python3-pytest-xdist
+      - python3-requests
       - python3-scapy
       - python3-setproctitle
       - python3-typing-extensions
