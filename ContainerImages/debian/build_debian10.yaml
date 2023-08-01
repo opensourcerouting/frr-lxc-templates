@@ -671,7 +671,8 @@ actions:
       echo "break-system-packages = true" >> /root/.config/pip/pip.conf
 
       # Add apkg pip3 package
-      /usr/bin/pip3 install apkg
+      # apkg 0.4.1 doesn't work on Debian 10 any more
+      /usr/bin/pip3 install "apkg<0.4.1"
 
       # Change SSH systemd to keep /run/sshd directory
       # (otherwise we get frequent connection errors)
