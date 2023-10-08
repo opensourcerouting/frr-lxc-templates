@@ -196,6 +196,7 @@ packages:
       - snmp
       - snmp-mibs-downloader
       - snmpd
+      - snmptrapd
       - socat
       - strace
       - sudo
