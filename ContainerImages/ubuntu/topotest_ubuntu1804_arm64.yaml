@@ -444,6 +444,8 @@ actions:
           python3.8 -m venv /root/pytest_exabgp4
           #
       fi
+      # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
+      chmod 711 /root
 
       # Install junitparser if it's not yet installed from deb package
       python3 -c "import junitparser" || pip3 install junitparser

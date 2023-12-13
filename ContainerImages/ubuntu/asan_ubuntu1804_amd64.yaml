@@ -449,6 +449,8 @@ actions:
           python3.8 -m venv /root/pytest_exabgp4
           #
       fi
+      # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
+      chmod 711 /root
 
       # Install ExaBGP 3.4.17 with PIP2
       /usr/local/bin/pip2 install 'exabgp==3.4.17'
