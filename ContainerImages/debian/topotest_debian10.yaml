@@ -274,11 +274,6 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
-      # Add latest mininet 2.3.0 package
-      wget -O temp.deb https://ftp.debian.org/debian/pool/main/m/mininet/mininet_2.3.0-1_${lxc_arch}.deb
-      dpkg -i temp.deb
-      rm -f temp.deb
-
       # Remove default socat binary (leave package to not break mininet)
       if [ -x "$(command -v socat)" ]; then
          rm -f `command -v socat`
@@ -297,9 +292,6 @@ actions:
       apt purge -y yodl
       cd /root
       rm -rf socat
-
-      # Enable OpenVSwitch startup
-      systemctl enable openvswitch-switch
 
       # Check for python3 to be a min of 3.8.9 and update from source if not
       currentver="$(python3 -V | cut -d' ' -f2)"
