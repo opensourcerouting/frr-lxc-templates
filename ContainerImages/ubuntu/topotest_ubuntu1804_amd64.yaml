@@ -208,6 +208,7 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - protobuf-compiler
       - protobuf-c-compiler
       - python3-jwt
       - python3-lxml

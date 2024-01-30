@@ -229,6 +229,7 @@ packages:
       - python3-zmq
       - patch
       - pkg-config
+      - protobuf-compiler
       - protobuf-c-compiler
       - net-tools
       - screen

@@ -234,6 +234,7 @@ packages:
       - openssh-server
       - pkg-config
       - pristine-tar
+      - protobuf-compiler
       - protobuf-c-compiler
       - psmisc
       - python3-dev
