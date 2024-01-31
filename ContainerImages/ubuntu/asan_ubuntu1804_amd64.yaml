@@ -505,13 +505,21 @@ actions:
       # Get additional SNMP MIBS
       if [ -d "/usr/share/snmp/mibs/ietf" ]
       then
-          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
-          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
-          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          # Original sources, but at least pastebin is unreliable. Use our cache
+          #wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          #wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          #wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Use cached copy
+          wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
       else
+          #
+          # Same cached copies here
           wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
-          wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/mibs/ietf/SNMPv2-PDU
-          wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
       fi
 
       # Cleanup underlying /run
