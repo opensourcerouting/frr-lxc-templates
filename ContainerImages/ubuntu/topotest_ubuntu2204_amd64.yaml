@@ -1,5 +1,5 @@
 # Tested on
-#   Ubuntu 22.04 aarch64  (jammy)
+#   Ubuntu 22.04 amd64  (jammy)
 #
 # Use Distrobuilder (see README.md) to create the LXC images
 # Default output is Ubuntu 22.04 on x86_64 architucture
@@ -11,7 +11,7 @@ image:
   release: jammy
   description: |-
     Ubuntu {{ image.release }}
-  architecture: aarch64
+  architecture: x86_64
 
 source:
   downloader: debootstrap
