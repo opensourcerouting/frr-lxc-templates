@@ -245,7 +245,6 @@ packages:
       - python3-sphinx
       - sudo
       - texinfo
-      - texlive-latex-base
       - vim
       - zlib1g-dev
       action: install
@@ -278,24 +277,6 @@ packages:
       - libprotoc23
       action: install
       releases:
-        - jammy
-
-    - packages:
-      - texlive-generic-recommended
-      action: install
-      releases:
-        - artful
-        - bionic
-        - cosmic
-        - disco
-        - trusty
-        - xenial
-
-    - packages:
-      - texlive
-      action: install
-      releases:
-        - focal
         - jammy
 
     - packages:

@@ -214,7 +214,6 @@ packages:
       - python3-sphinx
       - sudo
       - texinfo
-      #- texlive-latex-base
       - vim
       - zlib1g-dev
       action: install
