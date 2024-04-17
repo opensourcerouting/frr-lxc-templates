@@ -1,8 +1,8 @@
 # Tested on
-#   Ubuntu 16.04 aarch64/armhf  (xenial)
 #   Ubuntu 18.04 aarch64/armhf  (bionic)
-#   Ubuntu 20.04 aarch64        (focal)
-#   Ubuntu 22.04 aarch64        (jammy)
+#   Ubuntu 20.04 aarch64/armhf  (focal)
+#   Ubuntu 22.04 aarch64/armhf  (jammy)
+#   Ubuntu 24.04 aarch64/armhf  (noble)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -221,7 +221,6 @@ packages:
       - libpcre2-dev
       - libprotobuf-c-dev
       - libreadline-dev
-      - libsensors4-dev
       - libsnmp-base
       - libsnmp-dev
       - libssh-dev
@@ -258,6 +257,25 @@ packages:
         - trusty
         - xenial
         - focal
+
+    - packages:
+      - libsensors4-dev
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+        - focal
+        - jammy
+
+    - packages:
+      - libsensors-dev
+      action: install
+      releases:
+        - noble
 
     - packages:
       - libprotoc9v5
@@ -716,7 +734,7 @@ actions:
          /usr/bin/pip3 install "apkg<1.0"
       else
          # Add apkg pip3 package
-         /usr/bin/pip3 install apkg
+         PIP_BREAK_SYSTEM_PACKAGES=1 /usr/bin/pip3 install apkg
       fi
 
       # Cleanup underlying /run

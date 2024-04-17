@@ -4,17 +4,17 @@
 
 ## Requirements
 
-Only tested on Ubuntu 18.04 LTS and 20.04 LTS as the LXC Server host, but 
-might work on other Distros and versions
+Tested on Ubuntu 18.04 / 20.04 / 22.04 / 24.04 and Debian 12 as the 
+LXC Server host, but might work on other Distros and versions
 
-It is tested on Intel 64bit Architecture (x86_64) and Raspberry Pi 4.
+It is tested on Intel 64bit (x86_64) and ARM (aarch64) Architecture
 
 For Raspberry Pi 4, only modules with 4 GB RAM are supported.
-As a base OS for Raspberry, we use ARM8 Ubuntu 20.04 from
+As a base OS for Raspberry, we use ARM8 Ubuntu 22.04 from
 https://ubuntu.com/download/raspberry-pi
-(Pick Ubuntu 20.04 `64-bit` image)
+(Pick Ubuntu 22.04 `64-bit` image)
 
-For Intel, It is suggested to install a Ubuntu 20.04LTS as the server
+For Intel, It is suggested to install a Ubuntu 22.04LTS as the server
 
 ## Installation of LXC Server
 
@@ -102,24 +102,23 @@ or to build i386 Ubuntu 16.04:
 
 	distrobuilder build-lxc topotest-ubuntu-18.04-amd64.yaml -o image.release=xenial -o image.architecture=i386
 
-Other tested containers:
+Other Example builds:
 
 - Build on Intel (on x86_64 Ubuntu 20.04 host)
-	- Ubuntu 16.04, i386:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=i386`
-	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
 	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
 	- Ubuntu 20.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=focal -o image.architecture=x86_64`
 	- Ubuntu 22.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=jammy -o image.architecture=x86_64`
+	- Ubuntu 24.04, x86_64:  `distrobuilder build-lxc build_ubuntu1804_amd64.yaml -o image.release=noble -o image.architecture=x86_64`
 
 - Build on ARM (on Raspberry Pi4, Ubuntu 20.04 host)
-	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=armhf`
-	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
-	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=armhf`
 	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
-	- Ubuntu 20.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=armhf`
+	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=armhf`
 	- Ubuntu 20.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=aarch64`
+	- Ubuntu 20.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=focal -o image.architecture=armhf`
 	- Ubuntu 22.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=jammy -o image.architecture=aarch64`
 	- Ubuntu 22.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=jammy -o image.architecture=armhf`
+	- Ubuntu 24.04, aarch64:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=noble -o image.architecture=aarch64`
+	- Ubuntu 24.04, armhf:  `distrobuilder build-lxc build_ubuntu1804_arm64.yaml -o image.release=noble -o image.architecture=armhf`
 
 	- Debian 9, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=armhf`
 	- Debian 9, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=stretch -o image.architecture=aarch64`
@@ -130,14 +129,13 @@ Other tested containers:
 	- Debian 11, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=armhf`
 	- Debian 11, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bullseye -o image.architecture=aarch64`
 
+	- Debian 12, armhf:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bookworm -o image.architecture=armhf`
+	- Debian 12, aarch64:  `distrobuilder build-lxc build_debian10_arm64.yaml -o image.release=bookworm -o image.architecture=aarch64`
+
 - TopoTest on Intel (on x86_64 Ubuntu 20.04 host)
-	- Ubuntu 16.04, i386:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=i386`
-	- Ubuntu 16.04, x86_64:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=xenial -o image.architecture=x86_64`
 	- Ubuntu 18.04, x86_64:  `distrobuilder build-lxc topotest_ubuntu1804_amd64.yaml -o image.release=bionic -o image.architecture=x86_64`
 
 - TopoTest on ARM (on Raspberry Pi4, Ubuntu 20.04 host)
-	- Ubuntu 16.04, armhf:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=armhf`
-	- Ubuntu 16.04, aarch64:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=xenial -o image.architecture=aarch64`
 	- Ubuntu 18.04, armhf:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=armhf`
 	- Ubuntu 18.04, aarch64:  `distrobuilder build-lxc topotest_ubuntu1804_arm64.yaml -o image.release=bionic -o image.architecture=aarch64`
 
