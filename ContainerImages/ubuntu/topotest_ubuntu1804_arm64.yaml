@@ -468,7 +468,8 @@ actions:
       pip3 install --upgrade "pytest-metadata<3"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
-      pip3 install setproctitle py pytest-xdist zmq
+      pip3 install setproctitle py pytest-xdist
+      pip3 install "pyzmq<26" zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       pip3 install grpcio-tools munet
       deactivate
@@ -480,7 +481,8 @@ actions:
       pip3 install --upgrade "pytest-metadata<3"
       pip3 install scapy xmltodict junitparser jinja2 lxml
       pip3 install docutils gevent ipaddr ipaddress pingparsing
-      pip3 install setproctitle py pytest-xdist zmq
+      pip3 install setproctitle py pytest-xdist
+      pip3 install "pyzmq<26" zmq
       pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
       pip3 install grpcio-tools munet protobuf
       # Install ExaBGP 4
