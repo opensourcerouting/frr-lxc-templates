@@ -16,7 +16,7 @@ image:
 source:
   downloader: debootstrap
   same_as: gutsy
-  url: http://ports.ubuntu.com/ubuntu-ports
+  url: http://archive.ubuntu.com/ubuntu
   keyserver: keyserver.ubuntu.com
   keys:
     - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
@@ -378,7 +378,7 @@ actions:
       rm -rf socat
 
       # Add tini package (from Ubuntu 20.04)
-      wget -O temp.deb http://ports.ubuntu.com/ubuntu-ports/pool/universe/t/tini/tini_0.18.0-1_${lxc_arch}.deb
+      wget -O temp.deb http://archive.ubuntu.com/ubuntu/pool/universe/t/tini/tini_0.19.0-1_${lxc_arch}.deb
       dpkg -i temp.deb
       rm -f temp.deb
 
