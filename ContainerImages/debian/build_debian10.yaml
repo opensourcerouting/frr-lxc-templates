@@ -179,6 +179,8 @@ packages:
       - libcap-dev
       - libcmocka-dev
       - libelf-dev
+      - libgrpc-dev
+      - libgrpc++-dev
       - libjson-c-dev
       - liblttng-ust-dev
       - liblua5.3-dev
@@ -204,6 +206,7 @@ packages:
       - pkg-config
       - pristine-tar
       - protobuf-compiler
+      - protobuf-compiler-grpc
       - protobuf-c-compiler
       - psmisc
       - python3-dev
