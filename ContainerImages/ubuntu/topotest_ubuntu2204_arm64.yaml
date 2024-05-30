@@ -189,6 +189,8 @@ packages:
       - libcgroup1
       - libffi-dev
       - libgdbm-dev
+      - libgrpc-dev
+      - libgrpc++-dev
       - liblua5.3-dev
       - libncurses5-dev
       - libnss3-dev
@@ -204,6 +206,8 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - protobuf-compiler
+      - protobuf-compiler-grpc
       - protobuf-c-compiler
       - python3-jwt
       - python3-lxml

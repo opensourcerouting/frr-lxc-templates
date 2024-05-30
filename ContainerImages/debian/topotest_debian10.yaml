@@ -151,7 +151,10 @@ packages:
       - iputils-ping
       - libbz2-dev
       - libc-ares2
+      - libelf-dev
       - libffi-dev
+      - libgrpc-dev
+      - libgrpc++-dev
       - libgdbm-dev
       - liblua5.3-dev
       - libncurses5-dev
@@ -168,6 +171,9 @@ packages:
       - lua5.3
       - openssh-server
       - openvswitch-switch
+      - protobuf-compiler
+      - protobuf-compiler-grpc
+      - protobuf-c-compiler
       - psmisc
       - python3-jwt
       - python3-lxml

@@ -198,6 +198,8 @@ packages:
       - libelf-dev
       - libffi-dev
       - libgdbm-dev
+      - libgrpc-dev
+      - libgrpc++-dev
       - libjson-c-dev
       - liblttng-ust-dev
       - liblua5.3-dev
@@ -230,6 +232,7 @@ packages:
       - patch
       - pkg-config
       - protobuf-compiler
+      - protobuf-compiler-grpc
       - protobuf-c-compiler
       - net-tools
       - screen
