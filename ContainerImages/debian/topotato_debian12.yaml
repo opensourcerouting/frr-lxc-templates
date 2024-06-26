@@ -1,0 +1,361 @@
+# Tested on
+#   Debian 12   (buster)
+#
+# Use Distrobuilder (see README.md) to create the LXC images
+# Default output is Debian 10 on x86_64 architucture
+#
+
+image:
+  name: debian-topotest
+  distribution: debian
+  release: bookworm
+  description: |-
+    Debian {{ image.release }}
+  architecture: x86_64
+
+source:
+  downloader: debootstrap
+  url: http://deb.debian.org/debian
+  keyserver: keyserver.ubuntu.com
+  keys:
+    # Keys from https://ftp-master.debian.org/keys.html
+    #
+    # Debian 12 bookworm
+    - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
+    #
+    # Debian 11 bullseye
+    - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
+    #
+    # Debian 10 buster
+    - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
+
+targets:
+  lxc:
+    create-message: |-
+      You just created an {{ image.description }} container.
+
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_personality }}
+
+files:
+
+  - path: /etc/hostname
+    generator: hostname
+
+  - path: /etc/hosts
+    generator: hosts
+
+  - path: /etc/resolvconf/resolv.conf.d/original
+    generator: remove
+
+  - path: /etc/resolvconf/resolv.conf.d/tail
+    generator: remove
+
+  - path: /etc/machine-id
+    generator: remove
+
+  - path: /etc/network/interfaces
+    generator: dump
+    content: |-
+      # This file describes the network interfaces available on your system
+      # and how to activate them. For more information, see interfaces(5).
+
+      # The loopback network interface
+      auto lo
+      iface lo inet loopback
+
+      auto eth0
+      iface eth0 inet dhcp
+
+      source /etc/network/interfaces.d/*
+
+  - name: meta-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: network-config
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: user-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: vendor-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+packages:
+  manager: apt
+  update: true
+  cleanup: true
+
+  repositories:
+    - name: sources.list
+      url: |-
+        deb http://deb.debian.org/debian {{ image.release }} main non-free
+        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+
+    - name: frr-stable.list
+      url: |-
+        deb http://deb.frrouting.org/frr {{ image.release }} frr-stable
+      architectures:
+        - armhf
+        - arm64
+        - powerpc64
+        - ppc64el
+      releases:
+        - stretch
+
+  sets:
+    - packages:
+      - apt-transport-https
+      - autoconf
+      - bison
+      - build-essential
+      - cgroup-tools
+      - curl
+      - dnsutils
+      - flex
+      - gcovr
+      - gdb
+      - git
+      - graphviz
+      - install-info
+      - iperf
+      - iproute2
+      - iputils-ping
+      - lcov
+      - libbz2-dev
+      - libc-ares-dev
+      - libcap-dev
+      - libelf-dev
+      - libffi-dev
+      - libgdbm-dev
+      - libgrpc-dev
+      - libgrpc++-dev
+      - libjson-c-dev
+      - liblttng-ust-dev
+      - liblua5.3-dev
+      - libncurses5-dev
+      - libnss3-dev
+      - libpam0g-dev
+      - libpcre2-dev
+      - libpcre3-dev
+      - libprotobuf-c-dev
+      - libreadline-dev
+      - libsnmp-dev
+      - libsqlite3-dev
+      - libssh-dev
+      - libssl-dev
+      - libtool
+      - libunwind-dev
+      - locales
+      - lsof
+      - lua5.3
+      - openssh-server
+      - protobuf-compiler
+      - protobuf-compiler-grpc
+      - protobuf-c-compiler
+      - python3
+      - python3-docutils
+      - python3-exabgp
+      - python3-jinja2
+      - python3-jwt
+      - python3-lxml
+      - python3-markupsafe
+      - python3-pip
+      - python3-pkg-resources
+      - python3-pyinotify
+      - python3-pytest
+      - python3-pytest-xdist
+      - python3-requests
+      - python3-scapy
+      - python3-sphinx
+      - python3-typing-extensions
+      - python3-venv
+      - python3-xmltodict
+      - python3-zmq
+      - patch
+      - pkg-config
+      - net-tools
+      - screen
+      - smcroute
+      - snmp
+      - snmp-mibs-downloader
+      - snmpd
+      - snmptrapd
+      - socat
+      - strace
+      - sudo
+      - telnet
+      - texinfo
+      - tini
+      - tmux
+      - tshark
+      - vim
+      - vlan
+      - wireshark-common
+      - zlib1g-dev
+      action: install
+
+    - packages:
+      - libcgroup1
+      action: install
+      releases:
+        - bullseye
+        - buster
+
+    - packages:
+      - libcgroup2
+      - python3-junitparser
+      action: install
+      releases:
+        - bookworm
+
+    - packages:
+      - python3-grpc-tools
+      action: install
+      releases:
+        - bullseye
+        - bookworm
+
+    - packages:
+      - geoip-database
+      - tcl-expect
+      - tcl8.6
+      - xauth
+      - xdg-utils
+      action: remove
+
+actions:
+  - trigger: post-update
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
+
+      # Create the FRR user account and groups
+      groupadd --system frr
+      useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
+      groupadd --system frrvty
+      usermod -a -G frrvty frr
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Make sure the locale is built and functional
+      echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+      locale-gen en_US.UTF-8 UTF-8
+      update-locale LANG=en_US.UTF-8
+
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Enable PIP3 on newer OS
+      install -d /root/.config/pip
+      echo "[global]" > /root/.config/pip/pip.conf
+      echo "break-system-packages = true" >> /root/.config/pip/pip.conf
+
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      # Create /etc/frr directory for topotato FRR run
+      mkdir /etc/frr
+      
+      # Enable SNMP MIBS
+      sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
+
+      # Download extra SNMP MIBS
+      download-mibs
+
+      # Get additional SNMP MIBS
+      if [ -d "/usr/share/snmp/mibs/ietf" ]
+      then
+          # Original sources, but at least pastebin is unreliable. Use our cache
+          #wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          #wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          #wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Use cached copy
+          wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+      else
+          #
+          # Same cached copies here
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+      fi
+
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      mkdir /etc/systemd/system/ssh\@.service.d
+      echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
+
+      # Cleanup underlying /run
+      sync
+      mount -o bind / /mnt
+      rm -rf /mnt/run/*
+      umount /mnt
+
+      # Cleanup temporary shadow paths
+      rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
+
+mappings:
+  architecture_map: debian
