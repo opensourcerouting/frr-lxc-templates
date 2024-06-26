@@ -1,0 +1,475 @@
+# Tested on
+#   Ubuntu 20.04 amd64  (focal)
+#
+# Use Distrobuilder (see README.md) to create the LXC images
+# Default output is Ubuntu 18.04 on x86_64 architucture
+# Tested are 18.04 (bionic) and 22.04 (jammy)
+#
+
+image:
+  name: ubuntu-asan
+  distribution: ubuntu
+  release: jammy
+  description: |-
+    Ubuntu {{ image.release }}
+  architecture: x86_64
+
+source:
+  downloader: debootstrap
+  same_as: gutsy
+  url: http://archive.ubuntu.com/ubuntu
+  keyserver: keyserver.ubuntu.com
+  keys:
+    - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+    - 0xf6ecb3762474eda9d21b7022871920d1991bc93c
+
+targets:
+  lxc:
+    create-message: |-
+      You just created an {{ image.description }} container.
+
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/kernel/debug sys/kernel/debug none bind,optional 0 0
+          lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 0
+          lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
+          lxc.mount.entry = mqueue dev/mqueue mqueue rw,relatime,create=dir,optional 0 0
+
+          # Disable apparmor to be able to run mininet
+          lxc.mount.auto = cgroup:mixed proc:rw sys:mixed
+          lxc.apparmor.profile = unconfined
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/firmware/efi/efivars sys/firmware/efi/efivars none bind,optional 0 0
+          lxc.mount.entry = /proc/sys/fs/binfmt_misc proc/sys/fs/binfmt_misc none bind,optional 0 0
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_personality }}
+
+files:
+
+  - path: /etc/hostname
+    generator: hostname
+
+  - path: /etc/hosts
+    generator: hosts
+
+  - path: /etc/resolvconf/resolv.conf.d/original
+    generator: remove
+
+  - path: /etc/resolvconf/resolv.conf.d/tail
+    generator: remove
+
+  - path: /etc/machine-id
+    generator: remove
+
+  - path: /etc/netplan/10-lxc.yaml
+    generator: dump
+    content: |-
+      network:
+        version: 2
+        ethernets:
+          eth0: {dhcp4: true}
+    releases:
+    - artful
+    - bionic
+    - cosmic
+    - disco
+    - focal
+    - jammy
+
+  - path: /etc/network/interfaces
+    generator: dump
+    content: |-
+      # This file describes the network interfaces available on your system
+      # and how to activate them. For more information, see interfaces(5).
+
+      # The loopback network interface
+      auto lo
+      iface lo inet loopback
+
+      auto eth0
+      iface eth0 inet dhcp
+    releases:
+    - trusty
+    - xenial
+
+  - path: /etc/init/lxc-tty.conf
+    generator: upstart-tty
+    releases:
+    - trusty
+
+  - name: meta-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: network-config
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: user-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: vendor-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+packages:
+  manager: apt
+  update: true
+  cleanup: true
+
+  repositories:
+    - name: sources.list
+      url: |-
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
+        deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
+      architectures:
+        - amd64
+        - i386
+
+    - name: sources.list
+      url: |-
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
+      architectures:
+        - armhf
+        - arm64
+        - powerpc
+        - powerpc64
+        - ppc64el
+
+  sets:
+    - packages:
+      - apt-transport-https
+      - autoconf
+      - automake
+      - bison
+      - build-essential
+      - chrpath
+      - cgroup-tools
+      - cmake
+      - coreutils
+      - curl
+      - debhelper
+      - devscripts
+      - dh-autoreconf
+      - dnsutils
+      - doxygen
+      - equivs
+      - fakeroot
+      - flex
+      - gawk
+      - gcovr
+      - gdb
+      - git
+      - git-buildpackage
+      - graphviz
+      - groff
+      - install-info
+      - iperf
+      - iproute2
+      - iputils-ping
+      - lcov
+      - libbz2-dev
+      - libc-ares-dev
+      - libcap-dev
+      - libcgroup1
+      - libcmocka-dev
+      - libelf-dev
+      - libffi-dev
+      - libgdbm-dev
+      - libgrpc-dev
+      - libgrpc++-dev
+      - libjson-c-dev
+      - liblttng-ust-dev
+      - liblua5.3-dev
+      - libmnl-dev
+      - libncurses5-dev
+      - libnss3-dev
+      - libpam0g-dev
+      - libpcre2-dev
+      - libpcre3-dev
+      - libprotobuf-c-dev
+      - libreadline-dev
+      - libsnmp-base
+      - libsnmp-dev
+      - libsqlite3-dev
+      - libssh-dev
+      - libssl-dev
+      - libsystemd-dev
+      - libtool
+      - libunwind-dev
+      - libxslt1-dev
+      - libxml2-dev
+      - lintian
+      - lsof
+      - lua5.3
+      - make
+      - openssh-server
+      - patch
+      - pkg-config
+      - pristine-tar
+      - protobuf-compiler
+      - protobuf-compiler-grpc
+      - protobuf-c-compiler
+      - psmisc
+      - python3-dev
+      - python3-jwt
+      - python3-lxml
+      - python3-pip
+      - python3-pkg-resources
+      - python3-requests
+      - python3-sphinx
+      - python3-venv
+      - python3-xmltodict
+      - python3-zmq
+      - net-tools
+      - screen
+      - smcroute
+      - snmp
+      - snmp-mibs-downloader
+      - snmpd
+      - snmptrapd
+      - socat
+      - strace
+      - telnet
+      - texinfo
+      - tmux
+      - tshark
+      - vim
+      - vlan
+      - zlib1g-dev
+      action: install
+
+    - packages:
+      - python-ipaddr
+      - python-pip
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+
+    - packages:
+      - linux-tools-generic
+      - python2.7
+      - python3-junitparser
+      action: install
+      releases:
+        - focal
+        - jammy
+
+    - packages:
+      - geoip-database
+      - tcl-expect
+      - tcl8.6
+      - xauth
+      - xdg-utils
+      - python-pytest
+      - socat
+      action: remove
+
+actions:
+  - trigger: post-update
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
+
+      # Create the FRR user account and groups
+      groupadd --system frr
+      useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
+      groupadd --system frrvty
+      usermod -a -G frrvty frr
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+    releases:
+      - jammy
+      - focal
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Update ping
+      apt install -y meson xsltproc gettext
+      git clone https://github.com/iputils/iputils.git
+      cd iputils
+      git checkout 1ab5fafee626
+      mkdir build
+      meson . build
+      cd build
+      ninja
+      ninja install
+      ln -s /usr/local/bin/ping /usr/local/bin/ping6
+      apt purge -y meson xsltproc
+      apt autoremove -y
+
+    releases:
+      - bionic
+      - focal
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Make sure the locale is built and functional
+      locale-gen en_US.UTF-8
+      update-locale LANG=en_US.UTF-8
+
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      mkdir /etc/systemd/system/ssh\@.service.d
+      echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
+
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      # Add latest socat from Github:opensourcerouting/socat
+      cd /root
+      apt install -y yodl
+      git clone https://github.com/opensourcerouting/socat.git
+      cd socat
+      echo "\"opensourcerouting/socat@`git rev-parse --short HEAD`\"" > VERSION
+      autoconf
+      ./configure
+      make -j `nproc`
+      make install
+      apt purge -y yodl
+      cd /root
+      rm -rf socat
+
+      # Install junitparser if it's not yet installed from deb package
+      python3 -c "import junitparser" || pip3 install junitparser
+
+      # Create the venv Environments
+      #
+      # ExaBGP 4 Environment
+      python3 -m venv /root/pytest_exabgp4
+      #
+      # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
+      chmod 711 /root
+
+      # Create ExaBGP 4 Environment
+      . /root/pytest_exabgp4/bin/activate
+      pip3 install --upgrade "setuptools<66"
+      pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
+      pip3 install scapy xmltodict junitparser jinja2 lxml
+      pip3 install docutils gevent ipaddr ipaddress pingparsing
+      pip3 install setproctitle py "pytest-xdist<3.6" zmq
+      pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1,<3.3"
+      pip3 install grpcio-tools munet typing-extensions protobuf
+      # Install ExaBGP 4
+      #pip3 install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
+      pip3 install git+https://github.com/Exa-Networks/exabgp@0659057837cd6c6351579e9f0fa47e9fb7de7311
+      deactivate
+
+      # Create exabgp user
+      useradd -d /var/run/exabgp/ -s /bin/false exabgp
+
+      # Enable SNMP MIBS
+      sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
+
+      # Download extra SNMP MIBS
+      download-mibs
+
+      # Get additional SNMP MIBS
+      if [ -d "/usr/share/snmp/mibs/ietf" ]
+      then
+          # Original sources, but at least pastebin is unreliable. Use our cache
+          #wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          #wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          #wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Use cached copy
+          wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+      else
+          #
+          # Same cached copies here
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+      fi
+
+      # Cleanup underlying /run
+      sync
+      mount -o bind / /mnt
+      rm -rf /mnt/run/*
+      umount /mnt
+
+      # Cleanup temporary shadow paths
+      rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
+
+mappings:
+  architecture_map: debian
