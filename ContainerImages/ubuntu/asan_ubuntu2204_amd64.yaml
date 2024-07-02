@@ -386,6 +386,10 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
+      # add PIP for python2.7
+      curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+      python2.7 get-pip.py
+
       # Add latest socat from Github:opensourcerouting/socat
       cd /root
       apt install -y yodl
@@ -405,11 +409,31 @@ actions:
 
       # Create the venv Environments
       #
+      # ExaBGP 3 Environment
+      python3 -m venv /root/pytest_exabgp3
+      #
       # ExaBGP 4 Environment
       python3 -m venv /root/pytest_exabgp4
       #
       # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
       chmod 711 /root
+
+      # Install ExaBGP 3.4.17 with PIP2
+      /usr/local/bin/pip2 install 'exabgp==3.4.17'
+      mv -f /usr/local/bin/exabgp /usr/local/bin/exabgp-3.4.17
+      mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-3.4.17
+
+      # Create ExaBGP 3 Environment
+      . /root/pytest_exabgp3/bin/activate
+      pip3 install --upgrade "setuptools<66"
+      pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
+      pip3 install scapy xmltodict junitparser jinja2 lxml
+      pip3 install docutils gevent ipaddr ipaddress pingparsing
+      pip3 install setproctitle py pytest-xdist zmq
+      pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+      pip3 install grpcio-tools munet protobuf
+      deactivate
 
       # Create ExaBGP 4 Environment
       . /root/pytest_exabgp4/bin/activate

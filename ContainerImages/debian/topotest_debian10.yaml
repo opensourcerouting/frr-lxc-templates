@@ -280,6 +280,17 @@ actions:
       fi
       lxc_codename=${VERSION_CODENAME}
 
+      if [ ! -x "$(command -v python2.7)" ]; then
+        echo "deb http://archive.debian.org/debian stretch contrib main non-free" >> /etc/apt/sources.list
+        apt update
+        apt install -y python2.7
+        sed -i '/stretch/d' /etc/apt/sources.list
+      fi
+
+      # add PIP for python2.7
+      curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+      python2.7 get-pip.py
+
       # Remove default socat binary (leave package to not break mininet)
       if [ -x "$(command -v socat)" ]; then
          rm -f `command -v socat`
@@ -305,6 +316,9 @@ actions:
       if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
           # Python3 is equal or greater the required version
           #
+          # ExaBGP 3 Environment
+          python3 -m venv /root/pytest_exabgp3
+          #
           # ExaBGP 4 Environment
           python3 -m venv /root/pytest_exabgp4
           #
@@ -324,6 +338,9 @@ actions:
           #
           # Create the venv Environments
           #
+          # ExaBGP 3 Environment
+          python3.8 -m venv /root/pytest_exabgp3
+          #
           # ExaBGP 4 Environment
           python3.8 -m venv /root/pytest_exabgp4
           #
@@ -333,6 +350,23 @@ actions:
 
       # Install junitparser if it's not yet installed from deb package
       python3 -c "import junitparser" || pip3 install junitparser
+
+      # Install ExaBGP 3.4.17 with PIP2
+      /usr/local/bin/pip2 install 'exabgp==3.4.17'
+      mv -f /usr/local/bin/exabgp /usr/local/bin/exabgp-3.4.17
+      mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-3.4.17
+
+      # Create ExaBGP 3 Environment
+      . /root/pytest_exabgp3/bin/activate
+      pip3 install --upgrade "setuptools<66"
+      pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
+      pip3 install scapy xmltodict junitparser jinja2 lxml
+      pip3 install docutils gevent ipaddr ipaddress pingparsing
+      pip3 install setproctitle py pytest-xdist zmq
+      pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+      pip3 install grpcio-tools munet protobuf
+      deactivate
 
       # Create ExaBGP 4 Environment
       . /root/pytest_exabgp4/bin/activate
