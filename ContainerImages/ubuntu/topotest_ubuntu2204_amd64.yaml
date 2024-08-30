@@ -452,17 +452,21 @@ actions:
 
       # Create ExaBGP 4 Environment
       . /root/pytest_exabgp4/bin/activate
-      pip3 install --upgrade "setuptools<66"
-      pip3 install --upgrade "pytest<7"
-      pip3 install --upgrade "pytest-metadata<3"
-      pip3 install scapy xmltodict junitparser jinja2 lxml
-      pip3 install docutils gevent ipaddr ipaddress pingparsing
-      pip3 install setproctitle py pytest-xdist zmq
-      pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
-      pip3 install grpcio-tools munet protobuf
+      pip install wheel
+      pip install --upgrade "pytest>=6.2.4"
+      pip install --upgrade "pytest-metadata"
+      pip install "scapy>=2.4.5" xmltodict
+      pip install docutils pingparsing
+      pip install setproctitle "pytest-xdist>2.3.0"
+      pip install grpcio-tools "protobuf<4"
+      pip install pytest-random-order
+      # Extras for Topotato:
+      pip install aiohttp typing-extensions gevent jinja2
+      # Extras for Topotests Stats
+      pip install zmq junitparser lxml
       # Install ExaBGP 4
-      #pip3 install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
-      pip3 install git+https://github.com/Exa-Networks/exabgp@0659057837cd6c6351579e9f0fa47e9fb7de7311
+      #pip install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
+      pip install git+https://github.com/Exa-Networks/exabgp@0659057837cd6c6351579e9f0fa47e9fb7de7311
       deactivate
 
       # Create exabgp user
