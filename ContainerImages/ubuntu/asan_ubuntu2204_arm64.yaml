@@ -200,6 +200,7 @@ packages:
       - install-info
       - iperf
       - iproute2
+      - iptables
       - iputils-ping
       - lcov
       - libbz2-dev

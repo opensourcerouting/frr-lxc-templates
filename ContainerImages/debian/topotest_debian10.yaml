@@ -148,6 +148,7 @@ packages:
       - graphviz
       - iperf
       - iproute2
+      - iptables
       - iputils-ping
       - libbz2-dev
       - libc-ares2
