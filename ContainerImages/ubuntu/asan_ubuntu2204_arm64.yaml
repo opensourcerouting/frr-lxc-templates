@@ -267,6 +267,7 @@ packages:
       - strace
       - telnet
       - texinfo
+      - tini
       - tmux
       - tshark
       - vim
