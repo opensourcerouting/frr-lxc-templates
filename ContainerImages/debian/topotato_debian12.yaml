@@ -143,6 +143,7 @@ packages:
       - bison
       - build-essential
       - cgroup-tools
+      - cmake
       - curl
       - dnsutils
       - flex
@@ -159,6 +160,7 @@ packages:
       - libc-ares-dev
       - libcap-dev
       - libelf-dev
+      - libevent-dev
       - libffi-dev
       - libgdbm-dev
       - libgrpc-dev
@@ -172,6 +174,7 @@ packages:
       - libpcre2-dev
       - libpcre3-dev
       - libprotobuf-c-dev
+      - libprotobuf-dev
       - libreadline-dev
       - libsnmp-dev
       - libsqlite3-dev
