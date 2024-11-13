@@ -241,6 +241,25 @@ packages:
       action: install
 
     - packages:
+      - libpcre2-posix0
+      action: install
+      releases:
+        - bionic
+
+    - packages:
+      - libpcre2-posix2
+      action: install
+      releases:
+        - focal
+
+    - packages:
+      - libpcre2-posix3
+      action: install
+      releases:
+        - jammy
+        - noble
+
+    - packages:
       - python-ipaddr
       - python-pip
       action: install

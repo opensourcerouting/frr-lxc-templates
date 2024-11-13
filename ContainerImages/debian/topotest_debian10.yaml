@@ -205,6 +205,24 @@ packages:
       action: install
 
     - packages:
+      - libpcre2-posix0
+      action: install
+      releases:
+        - buster
+
+    - packages:
+      - libpcre2-posix2
+      action: install
+      releases:
+        - bullseye
+
+    - packages:
+      - libpcre2-posix3
+      action: install
+      releases:
+        - bookworm
+
+    - packages:
       - python3-junitparser
       action: install
       releases:
