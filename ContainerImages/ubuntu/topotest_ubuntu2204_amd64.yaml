@@ -254,7 +254,7 @@ packages:
       action: install
       releases:
         - jammy
-	- noble
+        - noble
 
     - packages:
       - python-ipaddr
