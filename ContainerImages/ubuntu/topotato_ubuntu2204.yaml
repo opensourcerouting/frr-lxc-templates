@@ -1,33 +1,25 @@
 # Tested on
-#   Debian 12   (buster)
+#   Ubuntu 22.04 aarch64  (focal)
 #
 # Use Distrobuilder (see README.md) to create the LXC images
-# Default output is Debian 10 on x86_64 architucture
 #
 
 image:
-  name: debian-topotato
-  distribution: debian
-  release: bookworm
+  name: ubuntu-topotato
+  distribution: ubuntu
+  release: jammy
   description: |-
-    Debian {{ image.release }}
-  architecture: x86_64
+    Ubuntu {{ image.release }}
+  architecture: aarch64
 
 source:
   downloader: debootstrap
-  url: http://deb.debian.org/debian
+  same_as: gutsy
+  url: http://ports.ubuntu.com/ubuntu-ports
   keyserver: keyserver.ubuntu.com
   keys:
-    # Keys from https://ftp-master.debian.org/keys.html
-    #
-    # Debian 12 bookworm
-    - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
-    #
-    # Debian 11 bullseye
-    - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
-    #
-    # Debian 10 buster
-    - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
+    - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
+    - 0xf6ecb3762474eda9d21b7022871920d1991bc93c
 
 targets:
   lxc:
@@ -41,22 +33,36 @@ targets:
       - type: all
         before: 5
         content: |-
-          lxc.include = LXC_TEMPLATE_CONFIG/debian.common.conf
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.common.conf
 
       - type: user
         before: 5
         content: |-
-          lxc.include = LXC_TEMPLATE_CONFIG/debian.userns.conf
+          lxc.include = LXC_TEMPLATE_CONFIG/ubuntu.userns.conf
 
       - type: all
         after: 4
         content: |-
           lxc.include = LXC_TEMPLATE_CONFIG/common.conf
 
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/kernel/debug sys/kernel/debug none bind,optional 0 0
+          lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 0
+          lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
+          lxc.mount.entry = mqueue dev/mqueue mqueue rw,relatime,create=dir,optional 0 0
+
+          # Disable apparmor to be able to run mininet
+          lxc.mount.auto = cgroup:mixed proc:rw sys:mixed
+          lxc.apparmor.profile = unconfined
+
       - type: user
         after: 4
         content: |-
           lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+          # For Ubuntu 14.04
+          lxc.mount.entry = /sys/firmware/efi/efivars sys/firmware/efi/efivars none bind,optional 0 0
+          lxc.mount.entry = /proc/sys/fs/binfmt_misc proc/sys/fs/binfmt_misc none bind,optional 0 0
 
       - type: all
         content: |-
@@ -79,6 +85,21 @@ files:
   - path: /etc/machine-id
     generator: remove
 
+  - path: /etc/netplan/10-lxc.yaml
+    generator: dump
+    content: |-
+      network:
+        version: 2
+        ethernets:
+          eth0: {dhcp4: true}
+    releases:
+    - artful
+    - bionic
+    - cosmic
+    - disco
+    - focal
+    - jammy
+
   - path: /etc/network/interfaces
     generator: dump
     content: |-
@@ -91,8 +112,14 @@ files:
 
       auto eth0
       iface eth0 inet dhcp
+    releases:
+    - trusty
+    - xenial
 
-      source /etc/network/interfaces.d/*
+  - path: /etc/init/lxc-tty.conf
+    generator: upstart-tty
+    releases:
+    - trusty
 
   - name: meta-data
     generator: cloud-init
@@ -122,19 +149,26 @@ packages:
   repositories:
     - name: sources.list
       url: |-
-        deb http://deb.debian.org/debian {{ image.release }} main non-free
-        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }} main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu {{ image.release }}-backports main restricted universe multiverse
+        deb http://security.ubuntu.com/ubuntu {{ image.release }}-security main restricted universe multiverse
+      architectures:
+        - amd64
+        - i386
 
-    - name: frr-stable.list
+    - name: sources.list
       url: |-
-        deb http://deb.frrouting.org/frr {{ image.release }} frr-stable
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }} main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-updates main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-backports main restricted universe multiverse
+        deb http://ports.ubuntu.com/ubuntu-ports {{ image.release }}-security main restricted universe multiverse
       architectures:
         - armhf
         - arm64
+        - powerpc
         - powerpc64
         - ppc64el
-      releases:
-        - stretch
 
   sets:
     - packages:
@@ -164,7 +198,6 @@ packages:
       - libcgroup-dev
       - libcmocka-dev
       - libelf-dev
-      - libevent-dev
       - libffi-dev
       - libgdbm-dev
       - libgrpc-dev
@@ -178,7 +211,6 @@ packages:
       - libpcre2-dev
       - libpcre3-dev
       - libprotobuf-c-dev
-      - libprotobuf-dev
       - libreadline-dev
       - libsnmp-dev
       - libsqlite3-dev
@@ -237,25 +269,13 @@ packages:
       action: install
 
     - packages:
-      - libcgroup1
-      action: install
-      releases:
-        - bullseye
-        - buster
-
-    - packages:
       - libcgroup2
       - python3-junitparser
-      action: install
-      releases:
-        - bookworm
-
-    - packages:
       - python3-grpc-tools
-      action: install
+     action: install
       releases:
-        - bullseye
-        - bookworm
+        - focal
+        - jammy
 
     - packages:
       - geoip-database
@@ -316,7 +336,7 @@ actions:
 
       # Create /etc/frr directory for topotato FRR run
       mkdir /etc/frr
-      
+
       # Enable SNMP MIBS
       sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
 
