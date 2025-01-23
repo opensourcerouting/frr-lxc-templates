@@ -10,12 +10,12 @@ image:
   release: jammy
   description: |-
     Ubuntu {{ image.release }}
-  architecture: aarch64
+  architecture: x86_64
 
 source:
   downloader: debootstrap
   same_as: gutsy
-  url: http://ports.ubuntu.com/ubuntu-ports
+  url: http://archive.ubuntu.com/ubuntu
   keyserver: keyserver.ubuntu.com
   keys:
     - 0x790BC7277767219C42C86F933B4FE6ACC0B21F32
@@ -269,21 +269,12 @@ packages:
       action: install
 
     - packages:
-      - libcgroup2
       - python3-junitparser
       - python3-grpc-tools
-     action: install
+      action: install
       releases:
         - focal
         - jammy
-
-    - packages:
-      - geoip-database
-      - tcl-expect
-      - tcl8.6
-      - xauth
-      - xdg-utils
-      action: remove
 
 actions:
   - trigger: post-update
@@ -309,8 +300,7 @@ actions:
       set -eux
 
       # Make sure the locale is built and functional
-      echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
-      locale-gen en_US.UTF-8 UTF-8
+      locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
 
       # Allow sudo group access without password
