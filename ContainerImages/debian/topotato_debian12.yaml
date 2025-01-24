@@ -237,14 +237,6 @@ packages:
       action: install
 
     - packages:
-      - libcgroup1
-      action: install
-      releases:
-        - bullseye
-        - buster
-
-    - packages:
-      - libcgroup2
       - python3-junitparser
       action: install
       releases:
