@@ -276,7 +276,7 @@ packages:
       releases:
         - focal
         - jammy
-	- noble
+        - noble
 
 actions:
   - trigger: post-update
