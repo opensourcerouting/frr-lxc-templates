@@ -199,6 +199,7 @@ packages:
       - libcgroup-dev
       - libcmocka-dev
       - libelf-dev
+      - libevent-dev
       - libffi-dev
       - libgdbm-dev
       - libgrpc-dev
