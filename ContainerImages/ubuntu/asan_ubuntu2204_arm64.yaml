@@ -450,10 +450,10 @@ actions:
       set -e
       if [ $s -eq 0 ]; then
           # protobuf is 3.21 or newer
-          pip install grpcio-tools "protobuf>=4"
+          pip install grpcio-tools munet "protobuf>=4"
       else
           # protobuf is older than 3.21
-          pip install grpcio-tools "protobuf<4"
+          pip install grpcio-tools munet "protobuf<4"
       fi
       pip install pytest-random-order
       # Extras for Topotato:

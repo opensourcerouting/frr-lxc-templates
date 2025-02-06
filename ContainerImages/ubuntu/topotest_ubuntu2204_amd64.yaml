@@ -478,7 +478,7 @@ actions:
       pip install "scapy>=2.4.5" xmltodict
       pip install docutils pingparsing
       pip install setproctitle "pytest-xdist>2.3.0"
-      pip install grpcio-tools "protobuf<4"
+      pip install grpcio-tools munet "protobuf<4"
       pip install pytest-random-order
       # Extras for Topotato:
       pip install aiohttp typing-extensions gevent jinja2
