@@ -229,6 +229,7 @@ packages:
       - snmpd
       - snmptrapd
       - socat
+      - ssmping
       - strace
       - telnet
       - tmux

@@ -224,6 +224,7 @@ packages:
       - snmpd
       - snmptrapd
       - socat
+      - ssmping
       - strace
       - sudo
       - telnet
