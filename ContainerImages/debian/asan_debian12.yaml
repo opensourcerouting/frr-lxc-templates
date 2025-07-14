@@ -9,7 +9,7 @@ image:
   distribution: debian
   release: bookworm
   description: |-
-    Ubuntu {{ image.release }}
+    Debian {{ image.release }}
   architecture: x86_64
 
 source:
@@ -123,10 +123,22 @@ packages:
   cleanup: true
 
   repositories:
-    - name: sources.list
-      url: |-
-        deb http://deb.debian.org/debian {{ image.release }} main non-free
-        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and image.release != "trixie" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+  - name: sources.list
+    url: |-
+      deb http://deb.debian.org/debian {{ image.release }} main non-free
+      {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and image.release != "trixie" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+    releases:
+      - trixie
+      - bookworm
+      - bullseye
+
+  - name: sources.list
+    url: |-
+      deb http://archive.debian.org/debian {{ image.release }} main non-free
+    releases:
+      - buster
+      - stretch
+      - jessie
 
   sets:
     - packages:

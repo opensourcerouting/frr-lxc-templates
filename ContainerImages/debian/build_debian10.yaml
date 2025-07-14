@@ -135,6 +135,18 @@ packages:
     url: |-
       deb http://deb.debian.org/debian {{ image.release }} main
       {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and image.release != "trixie" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+    releases:
+      - trixie
+      - bookworm
+      - bullseye
+
+  - name: sources.list
+    url: |-
+      deb http://archive.debian.org/debian {{ image.release }} main
+    releases:
+      - buster
+      - stretch
+      - jessie
 
   - name: frr-stable.list
     url: |-
