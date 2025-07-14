@@ -123,7 +123,7 @@ packages:
     - name: sources.list
       url: |-
         deb http://deb.debian.org/debian {{ image.release }} main non-free
-        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and image.release != "trixie" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
 
     - name: frr-stable.list
       url: |-
@@ -176,7 +176,6 @@ packages:
       - libnss3-dev
       - libpam0g-dev
       - libpcre2-dev
-      - libpcre3-dev
       - libprotobuf-c-dev
       - libprotobuf-dev
       - libreadline-dev
@@ -248,6 +247,14 @@ packages:
       releases:
         - bullseye
         - bookworm
+
+    - packages:
+      - libpcre3-dev
+      action: install
+      releases:
+        - bookworm
+        - bullseye
+        - buster
 
     - packages:
       - geoip-database
