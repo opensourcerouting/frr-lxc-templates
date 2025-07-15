@@ -242,6 +242,7 @@ packages:
       releases:
         - bullseye
         - bookworm
+        - trixie
 
     - packages:
       - libcgroup1
