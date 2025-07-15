@@ -343,9 +343,9 @@ actions:
       cd /root
       rm -rf socat
 
-      # Check for python3 to be a min of 3.8.9 and update from source if not
+      # Check for python3 to be a min of 3.9.0 and update from source if not
       currentver="$(python3 -V | cut -d' ' -f2)"
-      requiredver="3.8.9"
+      requiredver="3.9.0"
       if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
           # Python3 is equal or greater the required version
           #
@@ -358,24 +358,24 @@ actions:
       else
           # Python is too old. Upgrade
           #
-          # Install Python 3.8.9 from Source
-          curl -O https://www.python.org/ftp/python/3.8.9/Python-3.8.9.tar.xz
-          tar -xf Python-3.8.9.tar.xz
-          cd Python-3.8.9/
+          # Install Python 3.9.23 from Source
+          curl -O https://www.python.org/ftp/python/3.9.23/Python-3.9.23.tar.xz
+          tar -xf Python-3.9.23.tar.xz
+          cd Python-3.9.23/
           ./configure --enable-optimizations
           make -j `nproc`
           make altinstall
           cd ..
-          rm -rf Python-3.8.9.tar.xz
-          rm -rf Python-3.8.9
+          rm -rf Python-3.9.23.tar.xz
+          rm -rf Python-3.9.23
           #
           # Create the venv Environments
           #
           # ExaBGP 3 Environment
-          python3.8 -m venv /root/pytest_exabgp3
+          python3.9 -m venv /root/pytest_exabgp3
           #
           # ExaBGP 4 Environment
-          python3.8 -m venv /root/pytest_exabgp4
+          python3.9 -m venv /root/pytest_exabgp4
           #
       fi
       # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
