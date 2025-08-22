@@ -20,6 +20,9 @@ source:
   keys:
     # Keys from https://ftp-master.debian.org/keys.html
     #
+    # Debian 13 trixie
+    - 0x41587F7DB8C774BCCF131416762F67A0B2C39DE4
+    #
     # Debian 12 bookworm
     - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
     #
