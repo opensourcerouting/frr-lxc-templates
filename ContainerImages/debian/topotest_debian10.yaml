@@ -238,6 +238,7 @@ packages:
       action: install
       releases:
         - bookworm
+        - trixie
 
     - packages:
       - python3-junitparser
