@@ -1,0 +1,493 @@
+# Tested on
+#   Debian 10   (buster)
+#
+# Use Distrobuilder (see README.md) to create the LXC images
+# Default output is Debian 10 on x86_64 architucture
+#
+
+image:
+  name: debian-topotest
+  distribution: debian
+  release: buster
+  description: |-
+    Debian {{ image.release }}
+  architecture: x86_64
+
+source:
+  downloader: debootstrap
+  url: http://deb.debian.org/debian
+  keyserver: keyserver.ubuntu.com
+  keys:
+    # Keys from https://ftp-master.debian.org/keys.html
+    #
+    # Debian 13 trixie
+    - 0x41587F7DB8C774BCCF131416762F67A0B2C39DE4
+    #
+    # Debian 12 bookworm
+    - 0xA7236886F3CCCAAD148A27F80E98404D386FA1D9
+    #
+    # Debian 11 bullseye
+    - 0xA4285295FC7B1A81600062A9605C66F00D6C9793
+    #
+    # Debian 10 buster
+    - 0x6D33866EDD8FFA41C0143AEDDCC9EFBF77E11517
+
+targets:
+  lxc:
+    create-message: |-
+      You just created an {{ image.description }} container.
+
+      User 'ci' with password-less sudo access is added.
+      No default root or ci user password are set.
+
+    config:
+      - type: all
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.common.conf
+
+      - type: user
+        before: 5
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/debian.userns.conf
+
+      - type: all
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/common.conf
+
+      - type: user
+        after: 4
+        content: |-
+          lxc.include = LXC_TEMPLATE_CONFIG/userns.conf
+
+      - type: all
+        content: |-
+          lxc.arch = {{ image.architecture_personality }}
+
+files:
+
+  - path: /etc/hostname
+    generator: hostname
+
+  - path: /etc/hosts
+    generator: hosts
+
+  - path: /etc/resolvconf/resolv.conf.d/original
+    generator: remove
+
+  - path: /etc/resolvconf/resolv.conf.d/tail
+    generator: remove
+
+  - path: /etc/machine-id
+    generator: remove
+
+  - path: /etc/network/interfaces
+    generator: dump
+    content: |-
+      # This file describes the network interfaces available on your system
+      # and how to activate them. For more information, see interfaces(5).
+
+      # The loopback network interface
+      auto lo
+      iface lo inet loopback
+
+      auto eth0
+      iface eth0 inet dhcp
+
+      source /etc/network/interfaces.d/*
+
+  - name: meta-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: network-config
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: user-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+  - name: vendor-data
+    generator: cloud-init
+    variants:
+    - cloud
+
+packages:
+  manager: apt
+  update: true
+  cleanup: true
+
+  repositories:
+    - name: sources.list
+      url: |-
+        deb http://deb.debian.org/debian {{ image.release }} main non-free
+        {% if image.release != "sid" and image.release != "bullseye" and image.release != "bookworm" and image.release != "trixie" and not (image.release == "wheezy" and image.architecture_mapped == "powerpc") and not (image.release == "wheezy" and image.architecture_mapped == "s390x") %}deb http://security.debian.org/debian-security {{ image.release }}/updates main{% endif %}
+      releases:
+        - trixie
+        - bookworm
+        - bullseye
+
+    - name: sources.list
+      url: |-
+        deb http://archive.debian.org/debian {{ image.release }} main non-free
+      releases:
+        - buster
+        - stretch
+        - jessie
+
+    - name: frr-stable.list
+      url: |-
+        deb http://deb.frrouting.org/frr {{ image.release }} frr-stable
+      architectures:
+        - armhf
+        - arm64
+        - powerpc64
+        - ppc64el
+      releases:
+        - stretch
+
+
+  sets:
+    - packages:
+      - apt-transport-https
+      - build-essential
+      - cgroup-tools
+      - curl
+      - dnsutils
+      - gdb
+      - git
+      - graphviz
+      - iperf
+      - iproute2
+      - iptables
+      - iputils-ping
+      - libbz2-dev
+      - libc-ares2
+      - libelf-dev
+      - libffi-dev
+      - libgrpc-dev
+      - libgrpc++-dev
+      - libgdbm-dev
+      - liblua5.3-dev
+      - libncurses5-dev
+      - libnss3-dev
+      - libpcre2-8-0
+      - libreadline-dev
+      - libsqlite3-dev
+      - libssh-4
+      - libssl-dev
+      - libxslt1-dev
+      - libxml2-dev
+      - locales
+      - lsof
+      - lua5.3
+      - openssh-server
+      - openvswitch-switch
+      - protobuf-compiler
+      - protobuf-compiler-grpc
+      - protobuf-c-compiler
+      - psmisc
+      - python3-jwt
+      - python3-lxml
+      - python3-pip
+      - python3-pkg-resources
+      - python3-requests
+      - python3-sphinx
+      - python3-venv
+      - python3-xmltodict
+      - python3-zmq
+      - patch
+      - net-tools
+      - screen
+      - smcroute
+      - snmp
+      - snmpd
+      - snmptrapd
+      - socat
+      - ssmping
+      - strace
+      - sudo
+      - telnet
+      - tini
+      - tmux
+      - tshark
+      - vlan
+      - wget
+      - zlib1g-dev
+      action: install
+
+    - packages:
+      - libpcre2-posix0
+      action: install
+      releases:
+        - buster
+
+    - packages:
+      - libpcre2-posix2
+      action: install
+      releases:
+        - bullseye
+
+    - packages:
+      - libpcre2-posix3
+      action: install
+      releases:
+        - bookworm
+        - trixie
+
+    - packages:
+      - python3-junitparser
+      action: install
+      releases:
+        - bullseye
+        - bookworm
+        - trixie
+
+    - packages:
+      - libcgroup1
+      - libsnmp30
+      action: install
+      releases:
+        - buster
+        - bullseye
+
+    - packages:
+      - libcgroup2
+      - libsnmp40
+      action: install
+      releases:
+        - bookworm
+
+    - packages:
+      - geoip-database
+      - tcl-expect
+      - tcl8.6
+      - tex-common
+      - texinfo
+      - xauth
+      - xdg-utils
+      - python-pytest
+      action: remove
+
+actions:
+  - trigger: post-update
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Create the sudo group
+      getent group sudo >/dev/null 2>&1 || groupadd --system sudo
+
+      # Create the ci user account (as part of sudo group)
+      useradd --create-home -s /bin/bash -G sudo -U ci
+
+      # Create the FRR user account and groups
+      groupadd --system frr
+      useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr
+      groupadd --system frrvty
+      usermod -a -G frrvty frr
+
+  - trigger: post-packages
+    action: |-
+      #!/bin/sh
+      set -eux
+
+      # Make sure the locale is built and functional
+      echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+      locale-gen en_US.UTF-8 UTF-8
+      update-locale LANG=en_US.UTF-8
+
+      # Allow sudo group access without password
+      sed -i 's/sudo\s\+ALL=(ALL:ALL)\s\+ALL/sudo   ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+      # Get Details of this LXC container
+      lxc_arch=`dpkg --print-architecture`
+      if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        lxc_distro=${ID}
+        lxc_version=${VERSION%% *}
+      else
+        # Assume Debian if not /etc/os-release
+        lxc_distro=Debian
+        lxc_version=$(cat /etc/debian_version)
+      fi
+      lxc_codename=${VERSION_CODENAME}
+
+      if [ ! -x "$(command -v python2.7)" ]; then
+        echo "deb http://archive.debian.org/debian stretch contrib main non-free" >> /etc/apt/sources.list
+        apt update
+        apt install -y python2.7
+        sed -i '/stretch/d' /etc/apt/sources.list
+      fi
+
+      # add PIP for python2.7
+      curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+      python2.7 get-pip.py
+
+      # Remove default socat binary (leave package to not break mininet)
+      if [ -x "$(command -v socat)" ]; then
+         rm -f `command -v socat`
+      fi
+
+      # Add latest socat from Github:opensourcerouting/socat
+      cd /root
+      apt install -y yodl autoconf
+      git clone https://github.com/opensourcerouting/socat.git
+      cd socat
+      echo "\"opensourcerouting/socat@`git rev-parse --short HEAD`\"" > VERSION
+      autoconf
+      ./configure
+      make -j `nproc`
+      make install
+      apt purge -y yodl
+      cd /root
+      rm -rf socat
+
+      # Check for python3 to be a min of 3.9.0 and update from source if not
+      currentver="$(python3 -V | cut -d' ' -f2)"
+      requiredver="3.9.0"
+      if [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
+          # Python3 is equal or greater the required version
+          #
+          # ExaBGP 3 Environment
+          python3 -m venv /root/pytest_exabgp3
+          #
+          # ExaBGP 4 Environment
+          python3 -m venv /root/pytest_exabgp4
+          #
+      else
+          # Python is too old. Upgrade
+          #
+          # Install Python 3.9.23 from Source
+          curl -O https://www.python.org/ftp/python/3.9.23/Python-3.9.23.tar.xz
+          tar -xf Python-3.9.23.tar.xz
+          cd Python-3.9.23/
+          ./configure --enable-optimizations
+          make -j `nproc`
+          make altinstall
+          cd ..
+          rm -rf Python-3.9.23.tar.xz
+          rm -rf Python-3.9.23
+          #
+          # Create the venv Environments
+          #
+          # ExaBGP 3 Environment
+          python3.9 -m venv /root/pytest_exabgp3
+          #
+          # ExaBGP 4 Environment
+          python3.9 -m venv /root/pytest_exabgp4
+          #
+      fi
+      # Fix /root permission to allow nobody Exabgp to access python/exabgp in venv
+      chmod 711 /root
+
+      # Install junitparser if it's not yet installed from deb package
+      python3 -c "import junitparser" || pip3 install junitparser
+
+      # Install ExaBGP 3.4.17 with PIP2
+      /usr/local/bin/pip2 install 'exabgp==3.4.17'
+      mv -f /usr/local/bin/exabgp /usr/local/bin/exabgp-3.4.17
+      mv -f /usr/local/etc/exabgp /usr/local/etc/exabgp-3.4.17
+
+      # Create ExaBGP 3 Environment
+      . /root/pytest_exabgp3/bin/activate
+      pip3 install --upgrade "setuptools<66"
+      pip3 install --upgrade "pytest<7"
+      pip3 install --upgrade "pytest-metadata<3"
+      pip3 install scapy xmltodict junitparser jinja2 lxml
+      pip3 install docutils gevent ipaddr ipaddress pingparsing
+      pip3 install setproctitle py pytest-xdist zmq
+      pip3 install ipaddr ipaddress pingparsing "pytest-html>=3.1.1"
+      pip3 install grpcio-tools munet protobuf
+      deactivate
+
+      # Create ExaBGP 4 Environment
+      . /root/pytest_exabgp4/bin/activate
+      pip install wheel
+      pip install --upgrade "pytest>=6.2.4"
+      pip install --upgrade "pytest-metadata"
+      pip install "scapy>=2.4.5" xmltodict
+      pip install docutils pingparsing
+      pip install setproctitle "pytest-xdist>2.3.0"
+      VERSION=`dpkg-query --show --showformat '${Version}' libprotobuf-dev`
+      set +e
+      dpkg --compare-versions $VERSION ge 3.21
+      s=$?
+      set -e
+      if [ $s -eq 0 ]; then
+          # protobuf is 3.21 or newer
+          pip install grpcio-tools munet "protobuf>=4"
+      else
+          # protobuf is older than 3.21
+          pip install grpcio-tools munet "protobuf<4"
+      fi
+      pip install pytest-random-order
+      # Extras for Topotato:
+      pip install aiohttp typing-extensions gevent jinja2
+      # Extras for Topotests Stats
+      pip install zmq junitparser lxml
+      # Install ExaBGP 4
+      #pip install git+https://github.com/opensourcerouting/exabgp@4.2.11-frr
+      pip install git+https://github.com/Exa-Networks/exabgp@0659057837cd6c6351579e9f0fa47e9fb7de7311
+      deactivate
+
+      # Create exabgp user
+      useradd -d /var/run/exabgp/ -s /bin/false exabgp
+
+      # Enable SNMP MIBS
+      sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
+
+      wget https://files.netdef.org/frr/snmp_mibs/snmp-mibs-downloader_1.5_all.deb -O /tmp/snmp-mibs-downloader_1.5_all.deb
+      apt install -y /tmp/snmp-mibs-downloader_1.5_all.deb
+      # Download extra SNMP MIBS
+      download-mibs
+
+      # Get additional SNMP MIBS
+      if [ -d "/usr/share/snmp/mibs/ietf" ]
+      then
+          # Original sources, but at least pastebin is unreliable. Use our cache
+          #wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          #wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          #wget http://pastebin.com/raw.php?i=gG7j8nyk -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Use cached copy
+          wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+      else
+          #
+          # Same cached copies here
+          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/mibs/ietf/SNMPv2-PDU
+          wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+      fi
+
+      # Change SSH systemd to keep /run/sshd directory
+      # (otherwise we get frequent connection errors)
+      mkdir /etc/systemd/system/ssh\@.service.d
+      echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
+      echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
+
+      # Cleanup underlying /run
+      sync
+      mount -o bind / /mnt
+      rm -rf /mnt/run/*
+      umount /mnt
+
+      # Cleanup temporary shadow paths
+      rm /etc/*-
+
+      # Add builddate to /etc/lxc-config
+      echo "lxc.buildtime=`date -u -Iseconds`" >> /etc/lxc-config
+      echo "lxc.arch=${lxc_arch}" >> /etc/lxc-config
+      echo "lxc.distro=${lxc_distro}" >> /etc/lxc-config
+      echo "lxc.distroversion=${lxc_version}" >> /etc/lxc-config
+      echo "lxc.codename=${lxc_codename}" >> /etc/lxc-config
+
+mappings:
+  architecture_map: debian
