@@ -206,6 +206,7 @@ packages:
       - screen
       - smcroute
       - snmp
+      - snmp-mibs-downloader
       - snmpd
       - snmptrapd
       - socat
@@ -442,10 +443,17 @@ actions:
       # Enable SNMP MIBS
       sed -i 's/[#\s]*mibs.*/mibs \+ALL/g' /etc/snmp/snmp.conf
 
-      wget https://files.netdef.org/frr/snmp_mibs/snmp-mibs-downloader_1.5_all.deb -O /tmp/snmp-mibs-downloader_1.5_all.deb
-      apt install -y /tmp/snmp-mibs-downloader_1.5_all.deb
       # Download extra SNMP MIBS
       download-mibs
+
+      # Check for snmp-mibs-downloader version - Versions 1.6 and above are
+      # broken and need extra MIBs installed
+      dwnlmibsvers=`dpkg-query -f '${Version}\n' -W snmp-mibs-downloader`
+      VERSION=`dpkg-query --show --showformat '${Version}' snmp-mibs-downloader`
+      set +e
+      dpkg --compare-versions $VERSION ge 1.6
+      VERSION_COMP=$?
+      set -e
 
       # Get additional SNMP MIBS
       if [ -d "/usr/share/snmp/mibs/ietf" ]
@@ -459,12 +467,50 @@ actions:
           wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/snmp/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
           wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
           wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/snmp/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Download extra MIBs for broken snmp-mibs-downloader verison 1.7 and higher
+          # Original sources, but use our cache
+          # wget https://www.iana.org/assignments/ianasmf-mib/ianasmf-mib -O /usr/share/snmp/mibs/iana/IANA-SMF-MIB
+          # wget https://www.iana.org/assignments/ianaentity-mib/ianaentity-mib -O /usr/share/snmp/mibs/iana/IANA-ENTITY-MIB
+          # wget https://www.iana.org/assignments/ianapowerstateset-mib/ianapowerstateset-mib -O /usr/share/snmp/mibs/iana/IANAPowerStateSet-MIB
+          # wget https://www.iana.org/assignments/ianaolsrv2linkmetrictype-mib/ianaolsrv2linkmetrictype-mib -O /usr/share/snmp/mibs/iana/IANA-OLSRv2-LINK-METRIC-TYPE-MIB
+          # wget https://www.iana.org/assignments/ianaenergyrelation-mib/ianaenergyrelation-mib -O /usr/share/snmp/mibs/iana/IANA-ENERGY-RELATION-MIB
+          # wget https://www.iana.org/assignments/ianabfdtcstd-mib/ianabfdtcstd-mib -O /usr/share/snmp/mibs/iana/IANA-BFD-TC-STD-MIB
+          # wget https://www.iana.org/assignments/ianastoragemediatype-mib/ianastoragemediatype-mib -O /usr/share/snmp/mibs/iana/IANA-STORAGE-MEDIA-TYPE-MIB
+          # wget https://www.ieee802.org/1/files/public/MIBs/IEEE8021-CFM-MIB.mib -O /usr/share/snmp/mibs/IEEE8021-CFM-MIB
+          # wget https://www.ieee802.org/1/files/public/MIBs/LLDP-MIB-200505060000Z.mib -O /usr/share/snmp/mibs/LLDP-MIB
+          if [ ${VERSION_COMP} -eq 0 ]; then
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-SMF-MIB -O /usr/share/snmp/mibs/iana/IANA-SMF-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-BFD-TC-STD-MIB -O /usr/share/snmp/mibs/iana/IANA-BFD-TC-STD-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-ENERGY-RELATION-MIB -O /usr/share/snmp/mibs/iana/IANA-ENERGY-RELATION-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-ENTITY-MIB -O /usr/share/snmp/mibs/iana/IANA-ENTITY-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-OLSRv2-LINK-METRIC-TYPE-MIB -O /usr/share/snmp/mibs/iana/IANA-OLSRv2-LINK-METRIC-TYPE-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-SMF-MIB -O /usr/share/snmp/mibs/iana/IANA-SMF-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-STORAGE-MEDIA-TYPE-MIB -O /usr/share/snmp/mibs/iana/IANA-STORAGE-MEDIA-TYPE-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANAPowerStateSet-MIB -O /usr/share/snmp/mibs/iana/IANAPowerStateSet-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IEEE8021-CFM-MIB -O /usr/share/snmp/mibs/IEEE8021-CFM-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/LLDP-MIB -O /usr/share/snmp/mibs/LLDP-MIB
+          fi
       else
           #
           # Same cached copies here
-          wget http://www.iana.org/assignments/ianaippmmetricsregistry-mib/ianaippmmetricsregistry-mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
+          wget https://files.netdef.org/frr/snmp_mibs/IANA-IPPM-METRICS-REGISTRY-MIB.mib -O /usr/share/mibs/ietf/IANA-IPPM-METRICS-REGISTRY-MIB
           wget https://files.netdef.org/frr/snmp_mibs/SNMPv2-PDU.mib -O /usr/share/mibs/ietf/SNMPv2-PDU
           wget https://files.netdef.org/frr/snmp_mibs/IPATM-IPMC-MIB.mib -O /usr/share/mibs/ietf/IPATM-IPMC-MIB
+          #
+          # Download extra MIBs for broken snmp-mibs-downloader verison 1.7 and higher
+          if [ ${VERSION_COMP} -eq 0 ]; then
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-SMF-MIB -O /usr/share/snmp/mibs/iana/IANA-SMF-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-BFD-TC-STD-MIB -O /usr/share/snmp/mibs/iana/IANA-BFD-TC-STD-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-ENERGY-RELATION-MIB -O /usr/share/snmp/mibs/iana/IANA-ENERGY-RELATION-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-ENTITY-MIB -O /usr/share/snmp/mibs/iana/IANA-ENTITY-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-OLSRv2-LINK-METRIC-TYPE-MIB -O /usr/share/snmp/mibs/iana/IANA-OLSRv2-LINK-METRIC-TYPE-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-SMF-MIB -O /usr/share/snmp/mibs/iana/IANA-SMF-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANA-STORAGE-MEDIA-TYPE-MIB -O /usr/share/snmp/mibs/iana/IANA-STORAGE-MEDIA-TYPE-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IANAPowerStateSet-MIB -O /usr/share/snmp/mibs/iana/IANAPowerStateSet-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/IEEE8021-CFM-MIB -O /usr/share/snmp/mibs/IEEE8021-CFM-MIB
+              wget https://files.netdef.org/frr/snmp_mibs/extras_downloader_1.7/LLDP-MIB -O /usr/share/snmp/mibs/LLDP-MIB
+          fi
       fi
 
       # Change SSH systemd to keep /run/sshd directory
