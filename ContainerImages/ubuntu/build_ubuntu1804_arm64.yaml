@@ -700,6 +700,9 @@ actions:
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
+      # Enable ci account
+      usermod -p '*' ci
+
       # Make sure the locale is built and functional
       locale-gen en_US.UTF-8
       update-locale LANG=en_US.UTF-8
