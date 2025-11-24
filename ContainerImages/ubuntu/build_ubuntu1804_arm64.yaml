@@ -715,6 +715,9 @@ actions:
       echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
       echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
 
+      # Disable PAM in sshd_config (fix login issue on Debian 13)
+      sed -i 's/^UsePAM.*yes/UsePAM no/g' /etc/ssh/sshd_config
+
       # Get Details of this LXC container
       lxc_arch=`dpkg --print-architecture`
       if [ -f /etc/os-release ]; then
