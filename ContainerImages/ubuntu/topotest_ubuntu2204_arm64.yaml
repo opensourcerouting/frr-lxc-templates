@@ -321,9 +321,6 @@ actions:
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
-      # Enable ci account
-      usermod -p '*' ci
-
       # Create the FRR user account and groups
       groupadd --system frr
       useradd --system --gid frr --home-dir /nonexistent --comment "Frr routing suite" frr

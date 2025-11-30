@@ -673,9 +673,6 @@ actions:
       # Create the ci user account (as part of sudo group)
       useradd --create-home -s /bin/bash -G sudo -U ci
 
-      # Enable ci account
-      usermod -p '*' ci
-
   - trigger: post-packages
     action: |-
       #!/bin/sh
