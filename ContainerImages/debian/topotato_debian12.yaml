@@ -363,9 +363,6 @@ actions:
       echo "[Service]" > /etc/systemd/system/ssh\@.service.d/override.conf
       echo "RuntimeDirectoryPreserve=yes" >> /etc/systemd/system/ssh\@.service.d/override.conf
 
-      # Disable PAM in sshd_config (fix login issue on Debian 13)
-      sed -i 's/^UsePAM.*yes/UsePAM no/g' /etc/ssh/sshd_config
-
       # Cleanup underlying /run
       sync
       mount -o bind / /mnt
