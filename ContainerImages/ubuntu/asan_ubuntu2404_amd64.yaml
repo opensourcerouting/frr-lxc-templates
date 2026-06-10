@@ -208,6 +208,7 @@ packages:
       - libc-ares-dev
       - libcap-dev
       - libcmocka-dev
+      - libcunit1-dev
       - libelf-dev
       - libffi-dev
       - libgdbm-dev

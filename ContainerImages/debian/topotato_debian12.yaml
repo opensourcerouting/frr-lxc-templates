@@ -178,6 +178,7 @@ packages:
       - libcap-dev
       - libcgroup-dev
       - libcmocka-dev
+      - libcunit1-dev
       - libelf-dev
       - libevent-dev
       - libffi-dev

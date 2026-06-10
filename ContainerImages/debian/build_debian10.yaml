@@ -193,6 +193,7 @@ packages:
       - libc-ares-dev
       - libcap-dev
       - libcmocka-dev
+      - libcunit1-dev
       - libelf-dev
       - libgrpc-dev
       - libgrpc++-dev

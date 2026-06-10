@@ -184,6 +184,7 @@ packages:
       - libc-ares2
       - libcgroup1
       - libpcre2-8-0
+      - libcunit1-dev
       - librtr0
       - libsnmp35
       - libssh-4

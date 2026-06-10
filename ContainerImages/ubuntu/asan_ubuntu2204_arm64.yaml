@@ -208,6 +208,7 @@ packages:
       - libcap-dev
       - libcgroup1
       - libcmocka-dev
+      - libcunit1-dev
       - libelf-dev
       - libffi-dev
       - libgdbm-dev
