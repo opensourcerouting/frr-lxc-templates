@@ -167,6 +167,7 @@ packages:
         - powerpc
         - powerpc64
         - ppc64el
+        - riscv64
 
     - name: frr-stable.list
       url: |-
