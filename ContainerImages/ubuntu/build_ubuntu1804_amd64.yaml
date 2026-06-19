@@ -3,6 +3,7 @@
 #   Ubuntu 20.04 amd64       (focal)
 #   Ubuntu 22.04 amd64       (jammy)
 #   Ubuntu 24.04 amd64       (noble)
+#   Ubuntu 26.04 amd64       (resolute)
 #
 # Other Distro's and architectures are untested, but may work
 
@@ -96,6 +97,7 @@ files:
      - disco
      - focal
      - jammy
+     - resolute
 
  - path: /etc/network/interfaces
    generator: dump
@@ -220,7 +222,6 @@ packages:
       - libmnl-dev
       - libncurses5-dev
       - libpam-dev
-      - libpcre3-dev
       - libpcre2-dev
       - libprotobuf-c-dev
       - libreadline-dev
@@ -266,6 +267,20 @@ packages:
         - focal
 
     - packages:
+      - libpcre3-dev
+      action: install
+      releases:
+        - artful
+        - bionic
+        - cosmic
+        - disco
+        - trusty
+        - xenial
+        - focal
+        - jammy
+        - noble
+
+    - packages:
       - libsensors4-dev
       action: install
       releases:
@@ -283,12 +298,19 @@ packages:
       action: install
       releases:
         - noble
+        - resolute
 
     - packages:
       - libprotoc9v5
       action: install
       releases:
         - xenial
+
+    - packages:
+      - libprotoc-dev
+      action: install
+      releases:
+        - resolute
 
     - packages:
       - libprotoc10
