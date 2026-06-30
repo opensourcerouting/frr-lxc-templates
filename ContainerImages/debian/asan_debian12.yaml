@@ -261,6 +261,18 @@ packages:
         - buster
 
     - packages:
+      - gcc-12-plugin-dev
+      action: install
+      releases:
+        - bookworm
+
+    - packages:
+      - gcc-14-plugin-dev
+      action: install
+      releases:
+        - trixie
+
+    - packages:
       - geoip-database
       - tcl-expect
       - tcl8.6

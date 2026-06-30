@@ -284,6 +284,18 @@ packages:
         - bookworm
 
     - packages:
+      - gcc-12-plugin-dev
+      action: install
+      releases:
+        - bookworm
+
+    - packages:
+      - gcc-14-plugin-dev
+      action: install
+      releases:
+        - trixie
+
+    - packages:
       - geoip-database
       - hicolor-icon-theme
       - tcl-expect

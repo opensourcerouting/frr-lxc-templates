@@ -300,6 +300,36 @@ packages:
         - jammy
 
     - packages:
+      - gcc-7-plugin-dev
+      action: install
+      releases:
+        - bionic
+
+    - packages:
+      - gcc-9-plugin-dev
+      action: install
+      releases:
+        - focal
+
+    - packages:
+      - gcc-11-plugin-dev
+      action: install
+      releases:
+        - jammy
+
+    - packages:
+      - gcc-13-plugin-dev
+      action: install
+      releases:
+        - noble
+
+    - packages:
+      - gcc-15-plugin-dev
+      action: install
+      releases:
+        - resolute
+
+    - packages:
       - geoip-database
       - tcl-expect
       - tcl8.6

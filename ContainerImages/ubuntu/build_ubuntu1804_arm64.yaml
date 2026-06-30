@@ -332,6 +332,24 @@ packages:
         - xenial
 
     - packages:
+      - gcc-11-plugin-dev
+      action: install
+      releases:
+        - jammy
+
+    - packages:
+      - gcc-13-plugin-dev
+      action: install
+      releases:
+        - noble
+
+    - packages:
+      - gcc-15-plugin-dev
+      action: install
+      releases:
+        - resolute
+
+    - packages:
       - geoip-database
       - hicolor-icon-theme
       - tcl-expect
